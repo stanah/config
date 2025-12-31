@@ -23,9 +23,6 @@
 
   homebrew = {
     enable = true;
-    taps = [
-      "homebrew/cask-fonts"
-    ];
     onActivation = {
       cleanup = "zap";
       autoUpdate = false;
