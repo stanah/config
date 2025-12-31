@@ -6,7 +6,7 @@
   xdg.configFile."htop/htoprc".source = ../../config/htop/htoprc;
   xdg.configFile."nvim".source = ../../config/nvim;
   xdg.configFile."nvim".recursive = true;
-  xdg.configFile."mise/config.toml".source = ../../config/mise/config.toml;
+  xdg.configFile."mise/config.toml".source = ../../config/mise-global/config.toml;
 
   home.username = user;
   home.homeDirectory = if pkgs.stdenv.isDarwin then "/Users/${user}" else "/home/${user}";
