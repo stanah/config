@@ -1,5 +1,17 @@
 { config, pkgs, lib, ... }:
 {
+  programs.zsh.initExtraBeforeCompInit = lib.mkBefore ''
+    # Kiro CLI pre block. Keep at the top of this file.
+    [[ -f "${config.home.homeDirectory}/Library/Application Support/kiro-cli/shell/zshrc.pre.zsh" ]] \
+      && builtin source "${config.home.homeDirectory}/Library/Application Support/kiro-cli/shell/zshrc.pre.zsh"
+  '';
+
+  programs.zsh.initExtra = lib.mkAfter ''
+    # Kiro CLI post block. Keep at the bottom of this file.
+    [[ -f "${config.home.homeDirectory}/Library/Application Support/kiro-cli/shell/zshrc.post.zsh" ]] \
+      && builtin source "${config.home.homeDirectory}/Library/Application Support/kiro-cli/shell/zshrc.post.zsh"
+  '';
+
   home.sessionVariables = {
     NARGO_HOME = "${config.home.homeDirectory}/.nargo";
   };
