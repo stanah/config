@@ -11,11 +11,13 @@ chezmoi + nix-darwin + home-manager をまとめたリポジトリです。
 以下で nix-darwin をブートストラップします。
 
 ```sh
-nix run github:LnL7/nix-darwin -- switch --flake .#personal
+sudo env HOME="$HOME" USER="$USER" \
+  nix --extra-experimental-features "nix-command flakes" \
+  run github:LnL7/nix-darwin -- switch --flake ".#personal"
 ```
 
-### 3) chezmoi を初期化して反映
-このリポジトリを chezmoi の source として使います。
+### 3) chezmoi を初期化して反映（任意）
+このリポジトリは Nix/HM で設定を管理します。chezmoi を使う場合のみ実行します。
 
 ```sh
 nix profile install nixpkgs#chezmoi
@@ -29,6 +31,7 @@ chezmoi init --source "$PWD" --apply
 - `nix/darwin/personal.nix` の Homebrew パッケージを好みに合わせて編集してください。
 - `nix/home/common.nix` の `home.stateVersion` は更新方針に合わせて調整してください。
 - 秘密情報は `~/.config/private/env` と `~/.config/private/gitconfig` に置き、Git には載せません。
+- 既存ファイルは `.before-nix` でバックアップされます。
 
 ## 追加の分割
 

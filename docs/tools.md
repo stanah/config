@@ -5,7 +5,7 @@
 - Clone into GHQ_ROOT (`~/work`):
   - `ghq get github.com/OWNER/REPO`
 - List local repos:
-- `ghq list`
+  - `ghq list`
 
 ## git private config
 
@@ -36,8 +36,8 @@ Example:
 - Show current tools:
   - `mise ls`
 
-This repo provides `~/.config/mise/config.toml` and runs `mise install --yes`
-after activation, so Node is installed automatically.
+This repo provides `~/.config/mise/config.toml` (from `config/mise-global/config.toml`)
+and runs `mise install --yes` after activation, so Node is installed automatically.
 The activation step also trusts the config file automatically.
 
 Foundry is pinned via mise:

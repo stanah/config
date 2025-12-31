@@ -27,6 +27,8 @@ Configured for:
 - Solidity
 
 Mason is used to install them on first run.
+Node/npm is required for `pyright`, `ts_ls`, and Solidity LSP.
+Node is installed via mise automatically after activation.
 
 ## Keymaps
 

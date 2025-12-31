@@ -21,6 +21,10 @@ This repo replaces oh-my-zsh with sheldon and keeps fzf default key bindings.
 - fast-syntax-highlighting
 - zsh-autosuggestions
 
+## Package manager aliases
+
+- `npm`, `yarn`, `yarnpkg` are aliased to `pnpm`
+
 ## Private env file
 
 Secrets should NOT be committed. Put them here:
