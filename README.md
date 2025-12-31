@@ -28,11 +28,17 @@ chezmoi init --source "$PWD" --apply
 - `networking.hostName` は設定していないので、既存の macOS ホスト名が維持されます。
 - `nix/darwin/personal.nix` の Homebrew パッケージを好みに合わせて編集してください。
 - `nix/home/common.nix` の `home.stateVersion` は更新方針に合わせて調整してください。
+- 秘密情報は `~/.config/private/env` に置き、Git には載せません。
 
 ## 追加の分割
 
 - `nix/darwin/common.nix` と `nix/darwin/personal.nix` に分割しています。
 - `nix/home/common.nix` と `nix/home/personal.nix` に分割しています。
+
+## ドキュメント
+
+- `docs/zsh.md` (zsh 移行/補完/キーバインド)
+- `docs/tools.md` (導入ツールの基本的な使い方)
 
 ## メモ
 
