@@ -22,8 +22,8 @@
   };
 
   home.activation.miseInstall = lib.hm.dag.entryAfter ["writeBoundary"] ''
-    if command -v mise >/dev/null 2>&1; then
-      $DRY_RUN_CMD mise install --yes
+    if [ -x "${pkgs.mise}/bin/mise" ]; then
+      $DRY_RUN_CMD ${pkgs.mise}/bin/mise install --yes
     fi
   '';
 
