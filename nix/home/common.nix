@@ -109,7 +109,6 @@
   programs.atuin.enable = true;
   programs.sheldon.enable = true;
   programs.gh.enable = true;
-  programs.ghq.enable = true;
   programs.zoxide.enable = true;
   programs.eza.enable = true;
   programs.bat.enable = true;
@@ -122,6 +121,7 @@
     yazi
     mise
     zsh-completions
+    ghq
   ];
 
   xdg.configFile."sheldon/plugins.toml".text = ''
