@@ -8,7 +8,7 @@
   home.stateVersion = "24.05";
 
   home.sessionVariables = {
-    GHQ_ROOT = "${config.home.homeDirectory}/src";
+    GHQ_ROOT = "${config.home.homeDirectory}/work";
   };
 
   programs.git = {
