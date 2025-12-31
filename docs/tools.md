@@ -39,6 +39,10 @@ Example:
 This repo provides `~/.config/mise/config.toml` and runs `mise install --yes`
 after activation, so Node is installed automatically.
 
+Foundry is pinned via mise:
+
+- `foundry = "1.5.1"`
+
 ## direnv
 
 - Allow a project env:
