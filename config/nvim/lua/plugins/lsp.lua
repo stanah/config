@@ -13,12 +13,21 @@ return {
     config = function()
       local lspconfig = require("lspconfig")
       local mason_lspconfig = require("mason-lspconfig")
-      local mapping = require("mason-lspconfig.mappings.server").lspconfig_to_package
       local capabilities = require("cmp_nvim_lsp").default_capabilities()
+
+      local function as_set(list)
+        local set = {}
+        for _, item in ipairs(list) do
+          set[item] = true
+        end
+        return set
+      end
+
+      local available = as_set(mason_lspconfig.get_available_servers())
 
       local function pick_server(candidates)
         for _, name in ipairs(candidates) do
-          if mapping[name] then
+          if available[name] then
             return name
           end
         end
