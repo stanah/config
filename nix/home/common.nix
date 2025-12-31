@@ -4,6 +4,8 @@
 
   xdg.configFile."ghostty/config".source = ../../config/ghostty/config;
   xdg.configFile."htop/htoprc".source = ../../config/htop/htoprc;
+  xdg.configFile."nvim".source = ../../config/nvim;
+  xdg.configFile."nvim".recursive = true;
 
   home.username = user;
   home.homeDirectory = "/Users/${user}";
@@ -14,6 +16,8 @@
     GHQ_ROOT = "${config.home.homeDirectory}/work";
     BUN_INSTALL = "${config.home.homeDirectory}/.bun";
     ATUIN_NOBIND = "1";
+    EDITOR = "nvim";
+    VISUAL = "nvim";
   };
 
   home.sessionPath = [
@@ -30,7 +34,7 @@
     extraConfig = {
       init.defaultBranch = "main";
       pull.rebase = true;
-      core.editor = "vim";
+      core.editor = "nvim";
       alias = {
         lg = "log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative";
         lga = "log --graph --all --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative";
@@ -88,6 +92,12 @@
   };
 
   programs.starship.enable = true;
+  programs.neovim = {
+    enable = true;
+    viAlias = true;
+    vimAlias = true;
+    vimdiffAlias = true;
+  };
   programs.direnv = {
     enable = true;
     nix-direnv.enable = true;

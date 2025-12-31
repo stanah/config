@@ -39,11 +39,13 @@ chezmoi init --source "$PWD" --apply
 
 - `docs/zsh.md` (zsh 移行/補完/キーバインド)
 - `docs/tools.md` (導入ツールの基本的な使い方)
+- `docs/nvim.md` (Neovim セットアップ)
 
 ## 管理される設定
 
 - `config/ghostty/config`
 - `config/htop/htoprc`
+- `config/nvim/`
 
 ## フォント
 
