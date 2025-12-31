@@ -45,6 +45,10 @@ chezmoi init --source "$PWD" --apply
 - `config/ghostty/config`
 - `config/htop/htoprc`
 
+## フォント
+
+- `font-plemol-jp-nf` は Homebrew cask でインストールされます。
+
 ## メモ
 
 - chezmoi の source はリポジトリ直下です。`nix/` や `flake.nix` は `.chezmoiignore` で除外しています。

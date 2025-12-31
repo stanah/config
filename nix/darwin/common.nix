@@ -21,12 +21,16 @@
 
   homebrew = {
     enable = true;
+    taps = [
+      "homebrew/cask-fonts"
+    ];
     onActivation = {
       cleanup = "zap";
       autoUpdate = false;
       upgrade = false;
     };
     casks = [
+      "font-plemol-jp-nf"
       "ghostty"
       "kiro-cli"
     ];
