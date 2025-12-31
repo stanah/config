@@ -35,6 +35,8 @@
     ];
   };
 
+  home-manager.backupFileExtension = "before-nix";
+
   # nix-darwin uses a numeric stateVersion. Avoid changing this once set.
   system.stateVersion = 5;
 }
