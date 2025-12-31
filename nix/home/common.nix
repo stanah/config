@@ -31,7 +31,23 @@
     fi
   '';
 
+  home.activation.cliToolsInstall = lib.hm.dag.entryAfter ["miseInstall"] ''
+    export HOME="${config.home.homeDirectory}"
+    export USER="${config.home.username}"
+    export XDG_CONFIG_HOME="${config.xdg.configHome}"
+    export PATH="${config.home.homeDirectory}/.local/bin:$PATH"
+
+    if ! command -v claude >/dev/null 2>&1; then
+      $DRY_RUN_CMD ${pkgs.curl}/bin/curl -fsSL https://claude.ai/install.sh | /bin/bash
+    fi
+
+    if ! command -v cursor-agent >/dev/null 2>&1; then
+      $DRY_RUN_CMD ${pkgs.curl}/bin/curl -fsSL https://cursor.com/install | /bin/bash
+    fi
+  '';
+
   home.sessionPath = [
+    "${config.home.homeDirectory}/.local/bin"
     "${config.home.homeDirectory}/.bun/bin"
     "${config.home.homeDirectory}/.foundry/bin"
     "${config.home.homeDirectory}/.claude/local"
@@ -74,7 +90,6 @@
       npm = "pnpm";
       yarn = "pnpm";
       yarnpkg = "pnpm";
-      claude = "${config.home.homeDirectory}/.claude/local/claude";
       ".." = "cd ..";
       "..." = "cd ../..";
     };

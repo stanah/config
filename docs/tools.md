@@ -56,6 +56,14 @@ pnpm は mise でインストールされ、以下は **pnpm に置き換え**�
 - `pnpm = "latest"`
 - `npm`, `yarn`, `yarnpkg` → `pnpm`
 
+## claude-code / cursor cli
+
+この2つは公式のインストールスクリプトを使って自動インストールします。
+初回は `darwin-rebuild switch` 時に実行されます。
+
+- `claude`（claude-code CLI）
+- `cursor-agent`（Cursor CLI）
+
 ## direnv（ディレクトリごとの環境変数）
 
 - `.envrc` を許可して環境変数を読み込む  

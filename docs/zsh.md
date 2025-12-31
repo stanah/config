@@ -34,6 +34,10 @@ fzf のデフォルトキーバインドを使う構成にしています。
 
 - `npm`, `yarn`, `yarnpkg` は `pnpm` に置き換えています。
 
+## CLIの配置場所
+
+- `~/.local/bin` を PATH に追加しているため、ここに入るCLIが利用可能になります。
+
 ## Private env file
 
 秘密情報は **Gitに載せず** ここに置きます。
