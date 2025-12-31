@@ -2,6 +2,9 @@
 {
   xdg.enable = true;
 
+  xdg.configFile."ghostty/config".source = ../../config/ghostty/config;
+  xdg.configFile."htop/htoprc".source = ../../config/htop/htoprc;
+
   home.username = user;
   home.homeDirectory = "/Users/${user}";
 
@@ -21,9 +24,17 @@
 
   programs.git = {
     enable = true;
+    includes = [
+      { path = "${config.xdg.configHome}/private/gitconfig"; }
+    ];
     extraConfig = {
       init.defaultBranch = "main";
       pull.rebase = true;
+      core.editor = "vim";
+      alias = {
+        lg = "log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative";
+        lga = "log --graph --all --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative";
+      };
     };
   };
 

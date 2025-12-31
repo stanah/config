@@ -5,7 +5,23 @@
 - Clone into GHQ_ROOT (`~/work`):
   - `ghq get github.com/OWNER/REPO`
 - List local repos:
-  - `ghq list`
+- `ghq list`
+
+## git private config
+
+Put personal settings here (not committed):
+
+`~/.config/private/gitconfig`
+
+Example:
+
+```
+[user]
+    name = your-name
+    email = you@example.com
+[coderabbit]
+    machineId = your-machine-id
+```
 
 ## zoxide
 
