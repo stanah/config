@@ -19,6 +19,19 @@
     fd
   ];
 
+  homebrew = {
+    enable = true;
+    onActivation = {
+      cleanup = "zap";
+      autoUpdate = false;
+      upgrade = false;
+    };
+    casks = [
+      "ghostty"
+      "kiro-cli"
+    ];
+  };
+
   # nix-darwin uses a numeric stateVersion. Avoid changing this once set.
   system.stateVersion = 5;
 }

@@ -1,15 +1,8 @@
 { ... }:
 {
   homebrew = {
-    enable = true;
-    onActivation = {
-      cleanup = "zap";
-      autoUpdate = false;
-      upgrade = false;
-    };
     brews = [
-      "git"
-      "gh"
+      "xcodegen"
     ];
     casks = [
       "iterm2"
