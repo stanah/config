@@ -38,6 +38,7 @@ Example:
 
 This repo provides `~/.config/mise/config.toml` and runs `mise install --yes`
 after activation, so Node is installed automatically.
+The activation step also trusts the config file automatically.
 
 Foundry is pinned via mise:
 

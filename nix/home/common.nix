@@ -23,6 +23,7 @@
 
   home.activation.miseInstall = lib.hm.dag.entryAfter ["writeBoundary"] ''
     if [ -x "${pkgs.mise}/bin/mise" ]; then
+      $DRY_RUN_CMD ${pkgs.mise}/bin/mise trust --yes "${config.xdg.configHome}/mise/config.toml"
       $DRY_RUN_CMD ${pkgs.mise}/bin/mise install --yes
     fi
   '';
