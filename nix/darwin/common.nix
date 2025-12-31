@@ -10,6 +10,8 @@
   # Allow nix-darwin to know the user's home directory.
   users.users.${user}.home = "/Users/${user}";
 
+  system.primaryUser = user;
+
   programs.zsh.enable = true;
 
   environment.systemPackages = with pkgs; [
