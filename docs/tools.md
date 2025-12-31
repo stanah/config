@@ -44,6 +44,11 @@ Foundry is pinned via mise:
 
 - `foundry = "1.5.1"`
 
+pnpm is installed via mise and set as the default package manager:
+
+- `pnpm = "latest"`
+- `npm`, `yarn`, `yarnpkg` are aliased to `pnpm`
+
 ## direnv
 
 - Allow a project env:

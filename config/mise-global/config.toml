@@ -1,6 +1,7 @@
 [tools]
 node = "lts"
 foundry = "1.5.1"
+pnpm = "latest"
 
 [settings]
 auto_install = true

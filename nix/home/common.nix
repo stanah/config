@@ -71,6 +71,9 @@
       cat = "bat";
       g = "git";
       lg = "lazygit";
+      npm = "pnpm";
+      yarn = "pnpm";
+      yarnpkg = "pnpm";
       claude = "${config.home.homeDirectory}/.claude/local/claude";
       ".." = "cd ..";
       "..." = "cd ../..";
