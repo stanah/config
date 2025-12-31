@@ -1,19 +1,21 @@
 # Tools quickstart
 
-## ghq
+このドキュメントは「何をするコマンドか」を短く説明します。
 
-- Clone into GHQ_ROOT (`~/work`):
+## ghq（リポジトリ管理）
+
+- 指定リポジトリを `GHQ_ROOT`（既定: `~/work`）配下にクローンする  
   - `ghq get github.com/OWNER/REPO`
-- List local repos:
+- 取得済みリポジトリを一覧表示する  
   - `ghq list`
 
-## git private config
+## git private config（個人情報の分離）
 
-Put personal settings here (not committed):
+Git の個人情報やトークンは **リポジトリに含めず**にここへ置きます。
 
 `~/.config/private/gitconfig`
 
-Example:
+例:
 
 ```
 [user]
@@ -23,55 +25,64 @@ Example:
     machineId = your-machine-id
 ```
 
-## zoxide
+## zoxide（高速ディレクトリ移動）
 
-- Jump to a directory by name:
+- 以前移動した履歴からディレクトリにジャンプ  
   - `z <keyword>`
 
-## mise (replaces nvm/pyenv)
+## mise（言語/ツールのバージョン管理）
 
-- Set a tool version globally:
+- グローバルに使うバージョンを固定する  
   - `mise use -g node@20`
   - `mise use -g python@3.12`
-- Show current tools:
+- 現在有効なツール一覧を表示する  
   - `mise ls`
 
-This repo provides `~/.config/mise/config.toml` (from `config/mise-global/config.toml`)
-and runs `mise install --yes` after activation, so Node is installed automatically.
-The activation step also trusts the config file automatically.
+このリポジトリは `~/.config/mise/config.toml` を配布します  
+（元ファイル: `config/mise-global/config.toml`）。  
+適用時に `mise install --yes` を実行するので、**Node などは自動で入ります**。  
+また、適用時に `mise trust` も実行されます。
 
-Foundry is pinned via mise:
+### Foundry
+
+Foundry は mise で固定されています:
 
 - `foundry = "1.5.1"`
 
-pnpm is installed via mise and set as the default package manager:
+### pnpm（デフォルト化）
+
+pnpm は mise でインストールされ、以下は **pnpm に置き換え**られます:
 
 - `pnpm = "latest"`
-- `npm`, `yarn`, `yarnpkg` are aliased to `pnpm`
+- `npm`, `yarn`, `yarnpkg` → `pnpm`
 
-## direnv
+## direnv（ディレクトリごとの環境変数）
 
-- Allow a project env:
+- `.envrc` を許可して環境変数を読み込む  
   - `direnv allow`
 
-## atuin (no key binding by default)
+## atuin（履歴検索）
 
-- Search history:
+- コマンド履歴を検索する  
   - `atuin search <query>`
 
-## lazygit
+## lazygit（Git TUI）
 
-- Launch UI:
+- Git 用の操作画面を起動する  
   - `lazygit`
 
-## yazi
+## yazi（ファイルマネージャ）
 
-- Launch file manager:
+- TUI ファイルマネージャを起動する  
   - `yazi`
 
-## eza / bat / dust / tldr
+## eza / bat / dust / tldr（CLI 置き換え）
 
-- `eza -la --icons --git`
-- `bat <file>`
-- `dust <dir>`
-- `tldr <command>`
+- `eza -la --icons --git`  
+  - `ls` の高機能版（アイコン/ Git 状態表示）
+- `bat <file>`  
+  - `cat` の高機能版（シンタックスハイライト付き）
+- `dust <dir>`  
+  - `du` の見やすい版（サイズを分かりやすく表示）
+- `tldr <command>`  
+  - コマンドの短い使用例を表示
