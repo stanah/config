@@ -1,16 +1,17 @@
 { config, pkgs, lib, ... }:
 {
-  programs.zsh.initExtraBeforeCompInit = lib.mkBefore ''
-    # Kiro CLI pre block. Keep at the top of this file.
-    [[ -f "${config.home.homeDirectory}/Library/Application Support/kiro-cli/shell/zshrc.pre.zsh" ]] \
-      && builtin source "${config.home.homeDirectory}/Library/Application Support/kiro-cli/shell/zshrc.pre.zsh"
-  '';
-
-  programs.zsh.initExtra = lib.mkAfter ''
-    # Kiro CLI post block. Keep at the bottom of this file.
-    [[ -f "${config.home.homeDirectory}/Library/Application Support/kiro-cli/shell/zshrc.post.zsh" ]] \
-      && builtin source "${config.home.homeDirectory}/Library/Application Support/kiro-cli/shell/zshrc.post.zsh"
-  '';
+  programs.zsh.initContent = lib.mkMerge [
+    (lib.mkOrder 400 ''
+      # Kiro CLI pre block. Keep at the top of this file.
+      [[ -f "${config.home.homeDirectory}/Library/Application Support/kiro-cli/shell/zshrc.pre.zsh" ]] \
+        && builtin source "${config.home.homeDirectory}/Library/Application Support/kiro-cli/shell/zshrc.pre.zsh"
+    '')
+    (lib.mkOrder 1200 ''
+      # Kiro CLI post block. Keep at the bottom of this file.
+      [[ -f "${config.home.homeDirectory}/Library/Application Support/kiro-cli/shell/zshrc.post.zsh" ]] \
+        && builtin source "${config.home.homeDirectory}/Library/Application Support/kiro-cli/shell/zshrc.post.zsh"
+    '')
+  ];
 
   home.sessionVariables = {
     NARGO_HOME = "${config.home.homeDirectory}/.nargo";

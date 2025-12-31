@@ -31,7 +31,7 @@
     includes = [
       { path = "${config.xdg.configHome}/private/gitconfig"; }
     ];
-    extraConfig = {
+    settings = {
       init.defaultBranch = "main";
       pull.rebase = true;
       core.editor = "nvim";
@@ -44,12 +44,10 @@
 
   programs.zsh = {
     enable = true;
+    dotDir = config.home.homeDirectory;
     enableCompletion = true;
     autosuggestion.enable = false;
     syntaxHighlighting.enable = false;
-    initExtraBeforeCompInit = ''
-      fpath=(${pkgs.zsh-completions}/share/zsh/site-functions $fpath)
-    '';
     history = {
       path = "${config.xdg.stateHome}/zsh/history";
       size = 100000;
@@ -66,29 +64,34 @@
       ".." = "cd ..";
       "..." = "cd ../..";
     };
-    initExtra = ''
-      if [ -f "${config.xdg.configHome}/private/env" ]; then
-        source "${config.xdg.configHome}/private/env"
-      fi
+    initContent = lib.mkMerge [
+      (lib.mkOrder 550 ''
+        fpath=(${pkgs.zsh-completions}/share/zsh/site-functions $fpath)
+      '')
+      (lib.mkOrder 1000 ''
+        if [ -f "${config.xdg.configHome}/private/env" ]; then
+          source "${config.xdg.configHome}/private/env"
+        fi
 
-      # ghq root shortcut
-      cdpath=("$GHQ_ROOT")
+        # ghq root shortcut
+        cdpath=("$GHQ_ROOT")
 
-      setopt inc_append_history
-      setopt share_history
-      setopt hist_ignore_all_dups
-      setopt hist_reduce_blanks
-      setopt extended_glob
-      setopt no_beep
+        setopt inc_append_history
+        setopt share_history
+        setopt hist_ignore_all_dups
+        setopt hist_reduce_blanks
+        setopt extended_glob
+        setopt no_beep
 
-      if command -v mise >/dev/null 2>&1; then
-        eval "$(mise activate zsh)"
-      fi
+        if command -v mise >/dev/null 2>&1; then
+          eval "$(mise activate zsh)"
+        fi
 
-      if command -v sheldon >/dev/null 2>&1; then
-        eval "$(sheldon source)"
-      fi
-    '';
+        if command -v sheldon >/dev/null 2>&1; then
+          eval "$(sheldon source)"
+        fi
+      '')
+    ];
   };
 
   programs.starship.enable = true;
