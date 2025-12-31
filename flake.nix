@@ -12,8 +12,7 @@
   outputs = inputs@{ self, nixpkgs, darwin, home-manager, ... }:
     let
       user = "stanah";
-      host = "tanas-macbookpro";
-      hostName = "Tanas-MacBookPro";
+      host = "personal";
       system = "aarch64-darwin";
       pkgs = import nixpkgs { inherit system; };
     in
@@ -21,7 +20,7 @@
       darwinConfigurations.${host} = darwin.lib.darwinSystem {
         inherit system;
         specialArgs = {
-          inherit inputs user hostName;
+          inherit inputs user;
         };
         modules = [
           ./nix/darwin

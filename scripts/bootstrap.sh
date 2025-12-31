@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-HOST="tanas-macbookpro"
+HOST="personal"
 
 if ! command -v nix >/dev/null 2>&1; then
   echo "Nix が見つからないためインストールを開始します。"

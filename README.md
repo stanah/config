@@ -11,7 +11,7 @@ chezmoi + nix-darwin + home-manager をまとめたリポジトリです。
 以下で nix-darwin をブートストラップします。
 
 ```sh
-nix run github:LnL7/nix-darwin -- switch --flake .#tanas-macbookpro
+nix run github:LnL7/nix-darwin -- switch --flake .#personal
 ```
 
 ### 3) chezmoi を初期化して反映
@@ -24,11 +24,12 @@ chezmoi init --source "$PWD" --apply
 
 ## 変更ポイント
 
-- `flake.nix` の `user`, `host`, `hostName`, `system` を自分の環境に合わせて変更してください。
+- `flake.nix` の `user`, `host`, `system` を自分の環境に合わせて変更してください。
+- `networking.hostName` は設定していないので、既存の macOS ホスト名が維持されます。
 - `nix/darwin/default.nix` の Homebrew パッケージを好みに合わせて編集してください。
 - `nix/home/default.nix` の `home.stateVersion` は更新方針に合わせて調整してください。
 
 ## メモ
 
 - chezmoi の source はリポジトリ直下です。`nix/` や `flake.nix` は `.chezmoiignore` で除外しています。
-- darwin の適用は `darwin-rebuild switch --flake .#tanas-macbookpro` で実行できます。
+- darwin の適用は `darwin-rebuild switch --flake .#personal` で実行できます。
