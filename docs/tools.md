@@ -36,6 +36,9 @@ Example:
 - Show current tools:
   - `mise ls`
 
+This repo provides `~/.config/mise/config.toml` and runs `mise install --yes`
+after activation, so Node is installed automatically.
+
 ## direnv
 
 - Allow a project env:

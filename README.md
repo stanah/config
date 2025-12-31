@@ -46,6 +46,7 @@ chezmoi init --source "$PWD" --apply
 - `config/ghostty/config`
 - `config/htop/htoprc`
 - `config/nvim/`
+- `config/mise/config.toml`
 
 ## フォント
 

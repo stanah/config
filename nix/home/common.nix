@@ -6,6 +6,7 @@
   xdg.configFile."htop/htoprc".source = ../../config/htop/htoprc;
   xdg.configFile."nvim".source = ../../config/nvim;
   xdg.configFile."nvim".recursive = true;
+  xdg.configFile."mise/config.toml".source = ../../config/mise/config.toml;
 
   home.username = user;
   home.homeDirectory = if pkgs.stdenv.isDarwin then "/Users/${user}" else "/home/${user}";
@@ -19,6 +20,12 @@
     EDITOR = "nvim";
     VISUAL = "nvim";
   };
+
+  home.activation.miseInstall = lib.hm.dag.entryAfter ["writeBoundary"] ''
+    if command -v mise >/dev/null 2>&1; then
+      $DRY_RUN_CMD mise install --yes
+    fi
+  '';
 
   home.sessionPath = [
     "${config.home.homeDirectory}/.bun/bin"
