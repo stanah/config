@@ -1,0 +1,34 @@
+# config
+
+chezmoi + nix-darwin + home-manager をまとめたリポジトリです。
+
+## 使い方 (macOS)
+
+### 1) Nix を入れる
+公式インストーラで導入します（詳細は Nix のドキュメントを参照）。
+
+### 2) nix-darwin を初回適用
+以下で nix-darwin をブートストラップします。
+
+```sh
+nix run github:LnL7/nix-darwin -- switch --flake .#tanas-macbookpro
+```
+
+### 3) chezmoi を初期化して反映
+このリポジトリを chezmoi の source として使います。
+
+```sh
+nix profile install nixpkgs#chezmoi
+chezmoi init --source "$PWD" --apply
+```
+
+## 変更ポイント
+
+- `flake.nix` の `user`, `host`, `hostName`, `system` を自分の環境に合わせて変更してください。
+- `nix/darwin/default.nix` の Homebrew パッケージを好みに合わせて編集してください。
+- `nix/home/default.nix` の `home.stateVersion` は更新方針に合わせて調整してください。
+
+## メモ
+
+- chezmoi の source はリポジトリ直下です。`nix/` や `flake.nix` は `.chezmoiignore` で除外しています。
+- darwin の適用は `darwin-rebuild switch --flake .#tanas-macbookpro` で実行できます。

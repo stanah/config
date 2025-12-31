@@ -1,0 +1,8 @@
+/README.md
+/flake.nix
+/flake.lock
+/nix/**
+/scripts/**
+/.git/**
+/.gitignore
+/.chezmoiignore
