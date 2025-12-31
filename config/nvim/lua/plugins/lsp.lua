@@ -11,7 +11,6 @@ return {
       "hrsh7th/cmp-nvim-lsp",
     },
     config = function()
-      local lspconfig = require("lspconfig")
       local mason_lspconfig = require("mason-lspconfig")
       local capabilities = require("cmp_nvim_lsp").default_capabilities()
 
@@ -31,11 +30,6 @@ return {
             return name
           end
         end
-        for _, name in ipairs(candidates) do
-          if lspconfig[name] then
-            return name
-          end
-        end
         return nil
       end
 
@@ -44,7 +38,7 @@ return {
         "pyright",
       }
 
-      local ts_name = pick_server({ "tsserver", "ts_ls" })
+      local ts_name = pick_server({ "ts_ls", "tsserver" })
       if ts_name then
         table.insert(servers, ts_name)
       end
@@ -55,15 +49,27 @@ return {
       end
 
       mason_lspconfig.setup({ ensure_installed = servers })
-      mason_lspconfig.setup_handlers({
-        function(server_name)
-          if lspconfig[server_name] then
-            lspconfig[server_name].setup({
-              capabilities = capabilities,
-            })
+
+      local function setup_server(server_name)
+        if vim.lsp and vim.lsp.config then
+          if vim.lsp.config[server_name] ~= nil then
+            vim.lsp.config(server_name, { capabilities = capabilities })
+            vim.lsp.enable(server_name)
           end
-        end,
-      })
+          return
+        end
+
+        local lspconfig = require("lspconfig")
+        if lspconfig[server_name] then
+          lspconfig[server_name].setup({
+            capabilities = capabilities,
+          })
+        end
+      end
+
+      for _, server_name in ipairs(servers) do
+        setup_server(server_name)
+      end
     end,
   },
   {
