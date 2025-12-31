@@ -19,23 +19,6 @@
     fd
   ];
 
-  homebrew = {
-    enable = true;
-    onActivation = {
-      cleanup = "zap";
-      autoUpdate = false;
-      upgrade = false;
-    };
-    brews = [
-      "git"
-      "gh"
-    ];
-    casks = [
-      "iterm2"
-      "1password"
-    ];
-  };
-
   # nix-darwin uses a numeric stateVersion. Avoid changing this once set.
   system.stateVersion = 5;
 }

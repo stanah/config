@@ -1,10 +1,5 @@
-{ config, pkgs, lib, user, ... }:
+{ config, pkgs, lib, ... }:
 {
-  home.username = user;
-  home.homeDirectory = "/Users/${user}";
-
-  home.stateVersion = "24.05";
-
   programs.git.enable = true;
   programs.zsh.enable = true;
 

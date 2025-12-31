@@ -26,8 +26,13 @@ chezmoi init --source "$PWD" --apply
 
 - `flake.nix` の `user`, `host`, `system` を自分の環境に合わせて変更してください。
 - `networking.hostName` は設定していないので、既存の macOS ホスト名が維持されます。
-- `nix/darwin/default.nix` の Homebrew パッケージを好みに合わせて編集してください。
-- `nix/home/default.nix` の `home.stateVersion` は更新方針に合わせて調整してください。
+- `nix/darwin/personal.nix` の Homebrew パッケージを好みに合わせて編集してください。
+- `nix/home/common.nix` の `home.stateVersion` は更新方針に合わせて調整してください。
+
+## 追加の分割
+
+- `nix/darwin/common.nix` と `nix/darwin/personal.nix` に分割しています。
+- `nix/home/common.nix` と `nix/home/personal.nix` に分割しています。
 
 ## メモ
 

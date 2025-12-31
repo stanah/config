@@ -23,12 +23,18 @@
           inherit inputs user;
         };
         modules = [
-          ./nix/darwin
+          ./nix/darwin/common.nix
+          ./nix/darwin/personal.nix
           home-manager.darwinModules.home-manager
           {
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
-            home-manager.users.${user} = import ./nix/home;
+            home-manager.users.${user} = {
+              imports = [
+                ./nix/home/common.nix
+                ./nix/home/personal.nix
+              ];
+            };
           }
         ];
       };
@@ -39,7 +45,8 @@
           inherit inputs user;
         };
         modules = [
-          ./nix/home
+          ./nix/home/common.nix
+          ./nix/home/personal.nix
         ];
       };
     };
