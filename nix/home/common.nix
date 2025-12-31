@@ -44,6 +44,10 @@
     if ! command -v cursor-agent >/dev/null 2>&1; then
       $DRY_RUN_CMD ${pkgs.curl}/bin/curl -fsSL https://cursor.com/install | /bin/bash
     fi
+
+    if ! command -v coderabbit >/dev/null 2>&1; then
+      $DRY_RUN_CMD ${pkgs.curl}/bin/curl -fsSL https://cli.coderabbit.ai/install.sh | /bin/sh
+    fi
   '';
 
   home.sessionPath = [

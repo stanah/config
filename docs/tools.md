@@ -64,6 +64,13 @@ pnpm は mise でインストールされ、以下は **pnpm に置き換え**�
 - `claude`（claude-code CLI）
 - `cursor-agent`（Cursor CLI）
 
+## CodeRabbit CLI
+
+CodeRabbit CLI は公式スクリプトで自動インストールします。
+必要に応じてログインや初期設定を行ってください。
+
+- `coderabbit`
+
 ## direnv（ディレクトリごとの環境変数）
 
 - `.envrc` を許可して環境変数を読み込む  
