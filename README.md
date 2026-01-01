@@ -61,3 +61,13 @@ chezmoi init --source "$PWD" --apply
 - chezmoi の source はリポジトリ直下です。`nix/` や `flake.nix` は `.chezmoiignore` で除外しています。
 - darwin の適用は `darwin-rebuild switch --flake .#personal` で実行できます。
 - 既存設定をリポジトリへ反映する場合は `scripts/sync-config.sh` を実行してください。
+
+## 設定の同期手順（実機 → リポジトリ）
+
+実機で設定を変更した場合は、以下の手順でリポジトリへ反映します。
+
+```sh
+./scripts/sync-config.sh
+git add config/ghostty/config config/htop/htoprc config/starship/starship.toml
+git commit -m "設定更新"
+```
