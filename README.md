@@ -44,6 +44,19 @@ chezmoi init --source "$PWD" --apply
 - `docs/tools.md` (導入ツールの基本的な使い方)
 - `docs/nvim.md` (Neovim セットアップ)
 
+## プライベート環境変数のセットアップ
+
+秘密情報（APIキーなど）は Git 管理外の `~/.config/private/env` に置きます。
+
+```sh
+mkdir -p ~/.config/private
+cp config/private.env.example ~/.config/private/env
+# 実際の値を設定
+vim ~/.config/private/env
+```
+
+このファイルは zsh 起動時に自動で読み込まれます。
+
 ## 管理される設定
 
 - `config/ghostty/config`
