@@ -11,9 +11,13 @@ chezmoi + nix-darwin + home-manager をまとめたリポジトリです。
 以下で nix-darwin をブートストラップします。
 
 ```sh
-sudo env HOME="$HOME" USER="$USER" \
-  nix --extra-experimental-features "nix-command flakes" \
-  run github:LnL7/nix-darwin -- switch --flake ".#personal"
+sudo nix run github:LnL7/nix-darwin -- switch --flake ".#personal"
+```
+
+または、`scripts/bootstrap.sh`を実行します：
+
+```sh
+sudo ./scripts/bootstrap.sh
 ```
 
 ### 3) chezmoi を初期化して反映（任意）
@@ -72,7 +76,7 @@ vim ~/.config/private/env
 ## メモ
 
 - chezmoi の source はリポジトリ直下です。`nix/` や `flake.nix` は `.chezmoiignore` で除外しています。
-- darwin の適用は `darwin-rebuild switch --flake .#personal` で実行できます。
+- darwin の適用は `sudo darwin-rebuild switch --flake '.#personal'` で実行できます。
 - 既存設定をリポジトリへ反映する場合は `scripts/sync-config.sh` を実行してください。
 
 ## 設定の同期手順（実機 → リポジトリ）
