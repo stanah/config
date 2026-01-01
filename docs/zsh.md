@@ -25,6 +25,11 @@ fzf のデフォルトキーバインドを使う構成にしています。
 - zsh-autosuggestions  
   - 過去の入力履歴から予測入力を表示します。
 
+## Starship（プロンプト）
+
+- 設定は `~/.config/starship.toml` を使用します。
+- リポジトリ側は `config/starship/starship.toml` を管理します。
+
 ## 補完の仕組み
 
 - `zsh-completions` を fpath に追加してから `compinit` を実行しています。

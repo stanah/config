@@ -7,6 +7,7 @@
   xdg.configFile."nvim".source = ../../config/nvim;
   xdg.configFile."nvim".recursive = true;
   xdg.configFile."mise/config.toml".source = ../../config/mise-global/config.toml;
+  xdg.configFile."starship.toml".source = ../../config/starship/starship.toml;
 
   home.username = user;
   home.homeDirectory = if pkgs.stdenv.isDarwin then "/Users/${user}" else "/home/${user}";

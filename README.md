@@ -50,6 +50,7 @@ chezmoi init --source "$PWD" --apply
 - `config/htop/htoprc`
 - `config/nvim/`
 - `config/mise-global/config.toml`
+- `config/starship/starship.toml`
 
 ## フォント
 
@@ -59,3 +60,4 @@ chezmoi init --source "$PWD" --apply
 
 - chezmoi の source はリポジトリ直下です。`nix/` や `flake.nix` は `.chezmoiignore` で除外しています。
 - darwin の適用は `darwin-rebuild switch --flake .#personal` で実行できます。
+- 既存設定をリポジトリへ反映する場合は `scripts/sync-config.sh` を実行してください。
