@@ -91,7 +91,6 @@
       la = "eza -la --icons --git";
       cat = "bat";
       g = "git";
-      lg = "lazygit";
       npm = "pnpm";
       yarn = "pnpm";
       yarnpkg = "pnpm";
