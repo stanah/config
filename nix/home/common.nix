@@ -116,8 +116,53 @@
         setopt extended_glob
         setopt no_beep
 
-        # Delete key (forward delete)
-        bindkey '\e[3~' delete-char
+        # Key bindings (macOS/Ghostty向け。terminfo優先 + 代表的なシーケンスの保険)
+        zmodload -i zsh/terminfo
+        autoload -Uz add-zle-hook-widget
+
+        __bindkey_all() {
+          local key=$1 cmd=$2 km
+          for km in emacs viins vicmd; do
+            bindkey -M $km "$key" "$cmd"
+          done
+        }
+
+        __bindkey_apply() {
+          [[ -n ''${terminfo[khome]} ]] && __bindkey_all "''${terminfo[khome]}" beginning-of-line
+          [[ -n ''${terminfo[kend]}  ]] && __bindkey_all "''${terminfo[kend]}"  end-of-line
+          [[ -n ''${terminfo[kpp]}   ]] && __bindkey_all "''${terminfo[kpp]}"   beginning-of-buffer-or-history
+          [[ -n ''${terminfo[kpn]}   ]] && __bindkey_all "''${terminfo[kpn]}"   end-of-buffer-or-history
+          [[ -n ''${terminfo[kich1]} ]] && __bindkey_all "''${terminfo[kich1]}" overwrite-mode
+          [[ -n ''${terminfo[kdch1]} ]] && __bindkey_all "''${terminfo[kdch1]}" delete-char
+          [[ -n ''${terminfo[kcuu1]} ]] && __bindkey_all "''${terminfo[kcuu1]}" up-line-or-history
+          [[ -n ''${terminfo[kcud1]} ]] && __bindkey_all "''${terminfo[kcud1]}" down-line-or-history
+          [[ -n ''${terminfo[kcub1]} ]] && __bindkey_all "''${terminfo[kcub1]}" backward-char
+          [[ -n ''${terminfo[kcuf1]} ]] && __bindkey_all "''${terminfo[kcuf1]}" forward-char
+          [[ -n ''${terminfo[kcbt]}  ]] && __bindkey_all "''${terminfo[kcbt]}"  reverse-menu-complete
+
+          # 端末差分の保険（Ghostty/Terminal/iTerm2でよく出る）
+          __bindkey_all '\e[H' beginning-of-line
+          __bindkey_all '\eOH' beginning-of-line
+          __bindkey_all '\e[F' end-of-line
+          __bindkey_all '\eOF' end-of-line
+          __bindkey_all '\e[5~' beginning-of-buffer-or-history
+          __bindkey_all '\e[6~' end-of-buffer-or-history
+          __bindkey_all '\e[2~' overwrite-mode
+          __bindkey_all '\e[3~' delete-char
+          __bindkey_all '\e[Z' reverse-menu-complete
+        }
+
+        __bindkey_apply
+
+        if (( ''${+functions[add-zle-hook-widget]} )); then
+          add-zle-hook-widget zle-line-init __bindkey_apply
+          if (( ''${+terminfo[smkx]} )); then
+            __keymode_on() { echoti smkx }
+            __keymode_off() { echoti rmkx }
+            add-zle-hook-widget zle-line-init __keymode_on
+            add-zle-hook-widget zle-line-finish __keymode_off
+          fi
+        fi
 
         if command -v mise >/dev/null 2>&1; then
           eval "$(mise activate zsh)"
