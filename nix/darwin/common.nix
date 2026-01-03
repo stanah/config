@@ -24,7 +24,7 @@
   homebrew = {
     enable = true;
     onActivation = {
-      cleanup = "zap";
+      cleanup = "none";
       autoUpdate = false;
       upgrade = false;
     };

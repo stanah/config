@@ -117,6 +117,9 @@
         setopt extended_glob
         setopt no_beep
 
+        # Delete key (forward delete)
+        bindkey '\e[3~' delete-char
+
         if command -v mise >/dev/null 2>&1; then
           eval "$(mise activate zsh)"
         fi
