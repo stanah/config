@@ -51,6 +51,26 @@
     fi
   '';
 
+  home.activation.nvimTreesitterParsers = lib.hm.dag.entryAfter ["writeBoundary"] ''
+    if command -v nvim >/dev/null 2>&1; then
+      parser_dir="$HOME/.local/share/nvim/site/parser"
+      langs=""
+      for lang in markdown markdown_inline html json bash python; do
+        if [ ! -f "$parser_dir/''${lang}.so" ]; then
+          if [ -z "$langs" ]; then
+            langs="'$lang'"
+          else
+            langs="$langs,'$lang'"
+          fi
+        fi
+      done
+
+      if [ -n "$langs" ]; then
+        $DRY_RUN_CMD nvim --headless +"lua require('nvim-treesitter').install({$langs}):wait(300000)" +q
+      fi
+    fi
+  '';
+
   home.sessionPath = [
     "${config.home.homeDirectory}/.local/bin"
     "${config.home.homeDirectory}/.bun/bin"
