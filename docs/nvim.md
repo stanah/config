@@ -40,7 +40,9 @@ Node は mise により自動で入ります。
 ## Keymaps
 
 - `<leader>o`: Oil（ファイラーを開く）
-- `<leader>g`: lazygit（ターミナルで開く）
+- `<leader>g`: lazygit（フローティング）
+- `<leader>t`: ターミナル（フローティング）
+- `<leader>r`: シェルコマンド実行（フローティング）
 - `<leader>ff`: ファイル検索
 - `<leader>fg`: 全文検索（ripgrep）
 - `<leader>fb`: バッファ一覧
