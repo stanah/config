@@ -13,6 +13,7 @@ return {
       "toml",
       "markdown",
       "markdown_inline",
+      "html",
       "javascript",
       "typescript",
       "tsx",
