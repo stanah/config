@@ -13,9 +13,9 @@
     };
   };
 
-  outputs = inputs@{ self, nixpkgs, darwin, home-manager, "user-config": userConfigInput, ... }:
+  outputs = inputs@{ self, nixpkgs, darwin, home-manager, ... }:
     let
-      userConfig = import userConfigInput;
+      userConfig = import inputs."user-config";
       user = userConfig.user;
       host = userConfig.host;
       system = userConfig.system;
