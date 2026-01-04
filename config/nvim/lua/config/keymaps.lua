@@ -6,6 +6,7 @@ map("n", "]d", vim.diagnostic.goto_next, { desc = "Next diagnostic" })
 map("n", "<leader>e", vim.diagnostic.open_float, { desc = "Diagnostics" })
 map("n", "<leader>q", vim.diagnostic.setloclist, { desc = "Diagnostics list" })
 map("n", "<leader>o", "<cmd>Oil<CR>", { desc = "Open Oil" })
+map("n", "<leader>g", "<cmd>terminal lazygit<CR>", { desc = "Open lazygit" })
 
 local ok, telescope = pcall(require, "telescope.builtin")
 if ok then
