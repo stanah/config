@@ -148,14 +148,22 @@
         }
 
         __bindkey_apply() {
+          local up_widget down_widget
+          if (( ''${+widgets[history-substring-search-up]} )); then
+            up_widget=history-substring-search-up
+            down_widget=history-substring-search-down
+          else
+            up_widget=up-line-or-history
+            down_widget=down-line-or-history
+          fi
           [[ -n ''${terminfo[khome]} ]] && __bindkey_all "''${terminfo[khome]}" beginning-of-line
           [[ -n ''${terminfo[kend]}  ]] && __bindkey_all "''${terminfo[kend]}"  end-of-line
           [[ -n ''${terminfo[kpp]}   ]] && __bindkey_all "''${terminfo[kpp]}"   beginning-of-buffer-or-history
           [[ -n ''${terminfo[kpn]}   ]] && __bindkey_all "''${terminfo[kpn]}"   end-of-buffer-or-history
           [[ -n ''${terminfo[kich1]} ]] && __bindkey_all "''${terminfo[kich1]}" overwrite-mode
           [[ -n ''${terminfo[kdch1]} ]] && __bindkey_all "''${terminfo[kdch1]}" delete-char
-          [[ -n ''${terminfo[kcuu1]} ]] && __bindkey_all "''${terminfo[kcuu1]}" history-beginning-search-backward
-          [[ -n ''${terminfo[kcud1]} ]] && __bindkey_all "''${terminfo[kcud1]}" history-beginning-search-forward
+          [[ -n ''${terminfo[kcuu1]} ]] && __bindkey_all "''${terminfo[kcuu1]}" "$up_widget"
+          [[ -n ''${terminfo[kcud1]} ]] && __bindkey_all "''${terminfo[kcud1]}" "$down_widget"
           [[ -n ''${terminfo[kcub1]} ]] && __bindkey_all "''${terminfo[kcub1]}" backward-char
           [[ -n ''${terminfo[kcuf1]} ]] && __bindkey_all "''${terminfo[kcuf1]}" forward-char
           [[ -n ''${terminfo[kcbt]}  ]] && __bindkey_all "''${terminfo[kcbt]}"  reverse-menu-complete
@@ -169,6 +177,10 @@
           __bindkey_all '\e[6~' end-of-buffer-or-history
           __bindkey_all '\e[2~' overwrite-mode
           __bindkey_all '\e[3~' delete-char
+          __bindkey_all '\e[A' "$up_widget"
+          __bindkey_all '\e[B' "$down_widget"
+          __bindkey_all '\eOA' "$up_widget"
+          __bindkey_all '\eOB' "$down_widget"
           __bindkey_all '\e[Z' reverse-menu-complete
         }
 
@@ -188,8 +200,16 @@
           eval "$(mise activate zsh)"
         fi
 
-        if command -v sheldon >/dev/null 2>&1; then
-          eval "$(sheldon source)"
+        if [ -x "${pkgs.sheldon}/bin/sheldon" ]; then
+          export SHELDON_CONFIG_DIR="${config.xdg.configHome}/sheldon"
+          eval "$("${pkgs.sheldon}/bin/sheldon" source)"
+        fi
+
+        __bindkey_apply
+      '')
+      (lib.mkOrder 1300 ''
+        if (( ''${+functions[__bindkey_apply]} )); then
+          __bindkey_apply
         fi
       '')
     ];
@@ -237,6 +257,9 @@
 
     [plugins.zsh-autosuggestions]
     github = "zsh-users/zsh-autosuggestions"
+
+    [plugins.zsh-history-substring-search]
+    github = "zsh-users/zsh-history-substring-search"
 
     [plugins.fast-syntax-highlighting]
     github = "zdharma-continuum/fast-syntax-highlighting"
