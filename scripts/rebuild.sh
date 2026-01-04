@@ -10,10 +10,16 @@ if [[ "${NIX_CONFIG:-}" != *"experimental-features"* ]]; then
   export NIX_CONFIG
 fi
 
+USER_CONFIG="./nix/user-config.nix"
+OVERRIDE_ARGS=()
+if [ -f "$USER_CONFIG" ]; then
+  OVERRIDE_ARGS=(--override-input user-config "path:$USER_CONFIG")
+fi
+
 HOST="${1:-}"
-if [ -z "$HOST" ] && [ -f "./nix/user-config.nix" ]; then
-  HOST="$(nix eval --raw --expr '(import ./nix/user-config.nix).host' 2>/dev/null || true)"
+if [ -z "$HOST" ] && [ -f "$USER_CONFIG" ]; then
+  HOST="$(nix eval --raw --impure --expr "(import $USER_CONFIG).host" 2>/dev/null || true)"
 fi
 HOST="${HOST:-personal}"
 
-exec darwin-rebuild switch --flake ".#${HOST}"
+exec darwin-rebuild switch --flake ".#${HOST}" "${OVERRIDE_ARGS[@]}"
