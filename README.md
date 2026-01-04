@@ -39,6 +39,7 @@ chezmoi init --source "$PWD" --apply
 
 ## 変更ポイント
 
+- `nix/user-config.nix` は Git 管理外です。`nix/user-config.example.nix` をコピーして作成してください。
 - `nix/user-config.nix` の `user`, `host`, `system` を自分の環境に合わせて変更してください（`host` は `personal` / `work` を選択）。
 - `networking.hostName` は設定していないので、既存の macOS ホスト名が維持されます。
 - `nix/darwin/personal.nix` は個人用、`nix/darwin/work.nix` は業務用の設定として分離しています。
