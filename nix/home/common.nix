@@ -36,7 +36,7 @@
     export HOME="${config.home.homeDirectory}"
     export USER="${config.home.username}"
     export XDG_CONFIG_HOME="${config.xdg.configHome}"
-    export PATH="${pkgs.curl}/bin:${pkgs.wget}/bin:${pkgs.perl}/bin:${config.home.homeDirectory}/.local/bin:$PATH"
+    export PATH="${pkgs.curl}/bin:${pkgs.wget}/bin:${pkgs.perl}/bin:${pkgs.gnutar}/bin:${pkgs.gzip}/bin:${config.home.homeDirectory}/.local/bin:$PATH"
 
     if ! command -v claude >/dev/null 2>&1; then
       $DRY_RUN_CMD ${pkgs.curl}/bin/curl -fsSL https://claude.ai/install.sh | /bin/bash
