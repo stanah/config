@@ -7,13 +7,18 @@
     darwin.inputs.nixpkgs.follows = "nixpkgs";
     home-manager.url = "github:nix-community/home-manager";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
+    user-config = {
+      url = "path:./nix/user-config.nix";
+      flake = false;
+    };
   };
 
-  outputs = inputs@{ self, nixpkgs, darwin, home-manager, ... }:
+  outputs = inputs@{ self, nixpkgs, darwin, home-manager, "user-config": userConfigInput, ... }:
     let
-      user = "stanah";
-      host = "personal";
-      system = "aarch64-darwin";
+      userConfig = import userConfigInput;
+      user = userConfig.user;
+      host = userConfig.host;
+      system = userConfig.system;
       pkgs = import nixpkgs { inherit system; };
     in
     {

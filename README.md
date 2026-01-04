@@ -14,7 +14,14 @@ chezmoi + nix-darwin + home-manager をまとめたリポジトリです。
 sudo nix run github:LnL7/nix-darwin -- switch --flake ".#personal"
 ```
 
-または、`scripts/bootstrap.sh`を実行します：
+別ユーザ/ホストで使う場合は `user-config` を差し替えられます。
+
+```sh
+sudo nix run github:LnL7/nix-darwin -- switch --flake ".#myhost" \
+  --override-input user-config path:/path/to/user-config.nix
+```
+
+または、`scripts/bootstrap.sh`を実行します（引数が無い場合は `nix/user-config.nix` の `host` を参照）：
 
 ```sh
 sudo ./scripts/bootstrap.sh
@@ -30,7 +37,7 @@ chezmoi init --source "$PWD" --apply
 
 ## 変更ポイント
 
-- `flake.nix` の `user`, `host`, `system` を自分の環境に合わせて変更してください。
+- `nix/user-config.nix` の `user`, `host`, `system` を自分の環境に合わせて変更してください。
 - `networking.hostName` は設定していないので、既存の macOS ホスト名が維持されます。
 - `nix/darwin/personal.nix` の Homebrew パッケージを好みに合わせて編集してください。
 - `nix/home/common.nix` の `home.stateVersion` は更新方針に合わせて調整してください。
