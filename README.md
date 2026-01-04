@@ -11,20 +11,22 @@ chezmoi + nix-darwin + home-manager をまとめたリポジトリです。
 以下で nix-darwin をブートストラップします。
 
 ```sh
-sudo nix run github:LnL7/nix-darwin -- switch --flake ".#personal"
+sudo -H nix run github:LnL7/nix-darwin -- switch --flake ".#personal"
 ```
 
 別ユーザ/ホストで使う場合は `user-config` を差し替えられます。
 
 ```sh
-sudo nix run github:LnL7/nix-darwin -- switch --flake ".#myhost" \
+sudo -H nix run github:LnL7/nix-darwin -- switch --flake ".#myhost" \
   --override-input user-config path:/path/to/user-config.nix
 ```
+
+`sudo -H` は root の `HOME` を使うために必要です（`$HOME is not owned by you` エラー回避）。
 
 または、`scripts/bootstrap.sh`を実行します（引数が無い場合は `nix/user-config.nix` の `host` を参照）：
 
 ```sh
-sudo ./scripts/bootstrap.sh
+sudo -H ./scripts/bootstrap.sh
 ```
 
 ### 3) chezmoi を初期化して反映（任意）
