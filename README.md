@@ -85,7 +85,8 @@ vim ~/.config/private/env
 ## メモ
 
 - chezmoi の source はリポジトリ直下です。`nix/` や `flake.nix` は `.chezmoiignore` で除外しています。
-- darwin の適用は `sudo darwin-rebuild switch --flake '.#personal'` で実行できます。
+- darwin の適用は `sudo -H darwin-rebuild switch --flake '.#personal'` で実行できます。
+- スクリプト経由なら `sudo -H ./scripts/rebuild.sh` を使えます（`nix/user-config.nix` の `host` を参照）。
 - 既存設定をリポジトリへ反映する場合は `scripts/sync-config.sh` を実行してください。
 
 ## 設定の同期手順（実機 → リポジトリ）
