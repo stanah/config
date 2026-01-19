@@ -235,7 +235,6 @@
   programs.zoxide.enable = true;
   programs.eza.enable = true;
   programs.bat.enable = true;
-  programs.tmux.enable = true;
   programs.lazygit.enable = true;
 
   home.packages = with pkgs; [
@@ -247,6 +246,9 @@
     ghq
     gh
     perl
+    zellij
+    btop
+    lazydocker
   ];
 
   xdg.configFile."sheldon/plugins.toml".text = ''
