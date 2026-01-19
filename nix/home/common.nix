@@ -212,6 +212,12 @@
           __bindkey_apply
         fi
       '')
+      (lib.mkOrder 1500 ''
+        # ローカル設定（Git管理外）
+        if [ -f "$HOME/.zshrc.local" ]; then
+          source "$HOME/.zshrc.local"
+        fi
+      '')
     ];
   };
 
@@ -249,6 +255,8 @@
     zellij
     btop
     lazydocker
+    colima
+    docker
   ];
 
   xdg.configFile."sheldon/plugins.toml".text = ''
