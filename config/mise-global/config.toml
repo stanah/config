@@ -3,6 +3,7 @@ node = "lts"
 foundry = "1.5.1"
 pnpm = "latest"
 bun = "latest"
+uv = "latest"
 
 [settings]
 auto_install = true
