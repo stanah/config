@@ -8,6 +8,7 @@
   xdg.configFile."nvim".recursive = true;
   xdg.configFile."mise/config.toml".source = ../../config/mise-global/config.toml;
   xdg.configFile."starship.toml".source = ../../config/starship/starship.toml;
+  xdg.configFile."zellij/config.kdl".source = ../../config/zellij/config.kdl;
 
   home.username = user;
   home.homeDirectory = if pkgs.stdenv.isDarwin then "/Users/${user}" else "/home/${user}";
@@ -204,6 +205,15 @@
           export SHELDON_CONFIG_DIR="${config.xdg.configHome}/sheldon"
           eval "$("${pkgs.sheldon}/bin/sheldon" source)"
         fi
+
+        # Update Zellij pane title with current directory name
+        __zellij_update_title() {
+          if [ -n "$ZELLIJ" ]; then
+            printf "\033]2;%s\033\\" "''${PWD##*/}"
+          fi
+        }
+        autoload -Uz add-zsh-hook
+        add-zsh-hook precmd __zellij_update_title
 
         __bindkey_apply
       '')
