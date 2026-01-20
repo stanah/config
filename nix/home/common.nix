@@ -283,5 +283,8 @@
 
     [plugins.fast-syntax-highlighting]
     github = "zdharma-continuum/fast-syntax-highlighting"
+
+    [plugins.zsh-shift-select]
+    github = "jirutka/zsh-shift-select"
   '';
 }

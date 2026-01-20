@@ -69,3 +69,17 @@ quit-after-last-window-closed = true
 # macos-titlebar-style = tabs
 macos-option-as-alt = true
 
+# Unbind cmd+arrow keys to pass through to zellij
+keybind = cmd+left=unbind
+keybind = cmd+right=unbind
+keybind = cmd+up=unbind
+keybind = cmd+down=unbind
+keybind = cmd+shift+left=unbind
+keybind = cmd+shift+right=unbind
+keybind = cmd+shift+up=unbind
+keybind = cmd+shift+down=unbind
+keybind = cmd+alt+left=unbind
+keybind = cmd+alt+right=unbind
+keybind = cmd+alt+up=unbind
+keybind = cmd+alt+down=unbind
+
