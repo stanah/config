@@ -215,6 +215,55 @@
         autoload -Uz add-zsh-hook
         add-zsh-hook precmd __zellij_update_title
 
+        # Command completion notification for long-running commands
+        __cmd_start_time=0
+        __cmd_last_cmd=""
+
+        __notify_preexec() {
+          __cmd_start_time=$SECONDS
+          __cmd_last_cmd="$1"
+        }
+
+        __notify_precmd() {
+          local exit_code=$?
+          local elapsed=$((SECONDS - __cmd_start_time))
+          local threshold=5  # Only notify for commands taking 5+ seconds
+
+          if [ $elapsed -gt $threshold ] && [ -n "$ZELLIJ" ]; then
+            local tab_name="''${ZELLIJ_TAB_NAME:-Tab}"
+            local pane_id="''${ZELLIJ_PANE_ID:-Pane}"
+            local session_name="''${ZELLIJ_SESSION_NAME:-Session}"
+
+            # Truncate command if too long
+            local cmd_display="''${__cmd_last_cmd:0:50}"
+            if [ ''${#__cmd_last_cmd} -gt 50 ]; then
+              cmd_display="''${cmd_display}..."
+            fi
+
+            local status_icon="✓"
+            if [ $exit_code -ne 0 ]; then
+              status_icon="✗"
+            fi
+
+            local title="''${status_icon} Command completed (''${elapsed}s)"
+            local message="[''${session_name}] ''${tab_name} • Pane ''${pane_id}
+''${cmd_display}"
+
+            # macOS notification
+            if [[ "$OSTYPE" == darwin* ]]; then
+              osascript -e "display notification \"''${message}\" with title \"''${title}\"" 2>/dev/null &
+            # Linux notification
+            elif command -v notify-send >/dev/null 2>&1; then
+              notify-send "''${title}" "''${message}" 2>/dev/null &
+            fi
+          fi
+
+          __cmd_start_time=0
+        }
+
+        add-zsh-hook preexec __notify_preexec
+        add-zsh-hook precmd __notify_precmd
+
         __bindkey_apply
       '')
       (lib.mkOrder 1300 ''
