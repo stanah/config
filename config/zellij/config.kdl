@@ -23,6 +23,8 @@ keybinds clear-defaults=true {
         bind "s" { NewPane "stacked"; SwitchToMode "normal"; }
         bind "w" { ToggleFloatingPanes; SwitchToMode "normal"; }
         bind "z" { TogglePaneFrames; SwitchToMode "normal"; }
+        // Toggle through stacked panes in group
+        bind "tab" { TogglePaneInGroup; SwitchToMode "normal"; }
     }
     tab {
         bind "left" { GoToPreviousTab; }
@@ -313,13 +315,13 @@ web_client {
  
 // The name of the default layout to load on startup
 // Default: "default"
-// 
+//
 // default_layout "compact"
- 
+
 // The folder in which Zellij will look for layouts
 // (Requires restart)
-// 
-// layout_dir "/tmp"
+// Available layouts: dev-workspace, synced-workspace
+layout_dir "~/.config/zellij/layouts"
  
 // The folder in which Zellij will look for themes
 // (Requires restart)

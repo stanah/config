@@ -1,0 +1,83 @@
+// Synced Workspace Layout with Pane Sync Plugin
+// 4 columns x 2 rows with automatic pane synchronization
+//
+// This layout uses the pane-sync plugin to automatically
+// switch the upper pane when you focus a lower pane.
+//
+// Usage:
+//   zellij --layout synced-workspace
+//
+// Build the plugin first:
+//   cd plugins/zellij-pane-sync && cargo build --release
+
+layout {
+    default_tab_template {
+        pane size=1 borderless=true {
+            plugin location="zellij:tab-bar"
+        }
+        children
+        pane size=2 borderless=true {
+            plugin location="zellij:status-bar"
+        }
+    }
+
+    tab name="dev" focus=true {
+        pane size=1 borderless=true {
+            plugin location="zellij:tab-bar"
+        }
+
+        // Pane sync plugin (runs invisibly)
+        pane size=0 borderless=true {
+            plugin location="file:~/.config/zellij/plugins/zellij-pane-sync.wasm" {
+                columns "4"
+                debug "false"
+            }
+        }
+
+        pane split_direction="vertical" {
+            // === Column 1 ===
+            pane split_direction="horizontal" {
+                pane stacked=true size="35%" {
+                    pane name="git-1" command="lazygit" start_suspended=true
+                    pane name="files-1" command="yazi" start_suspended=true
+                    pane name="shell-1"
+                }
+                pane name="work-1" size="65%" focus=true
+            }
+
+            // === Column 2 ===
+            pane split_direction="horizontal" {
+                pane stacked=true size="35%" {
+                    pane name="git-2" command="lazygit" start_suspended=true
+                    pane name="files-2" command="yazi" start_suspended=true
+                    pane name="shell-2"
+                }
+                pane name="work-2" size="65%"
+            }
+
+            // === Column 3 ===
+            pane split_direction="horizontal" {
+                pane stacked=true size="35%" {
+                    pane name="git-3" command="lazygit" start_suspended=true
+                    pane name="files-3" command="yazi" start_suspended=true
+                    pane name="shell-3"
+                }
+                pane name="work-3" size="65%"
+            }
+
+            // === Column 4 ===
+            pane split_direction="horizontal" {
+                pane stacked=true size="35%" {
+                    pane name="git-4" command="lazygit" start_suspended=true
+                    pane name="files-4" command="yazi" start_suspended=true
+                    pane name="shell-4"
+                }
+                pane name="work-4" size="65%"
+            }
+        }
+
+        pane size=2 borderless=true {
+            plugin location="zellij:status-bar"
+        }
+    }
+}

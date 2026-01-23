@@ -1,0 +1,19 @@
+[package]
+name = "zellij-pane-sync"
+version = "0.1.0"
+edition = "2021"
+authors = ["Your Name"]
+description = "Zellij plugin to sync upper panes with lower pane focus"
+license = "MIT"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+zellij-tile = "0.41.0"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+[profile.release]
+opt-level = "s"
+lto = true
