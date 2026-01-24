@@ -172,10 +172,19 @@
           eval "$("${pkgs.sheldon}/bin/sheldon" source)"
         fi
 
-        # Update Zellij pane title with current directory name
+        # Update Zellij pane title with repository name and branch (or directory name)
         __zellij_update_title() {
           if [ -n "$ZELLIJ" ]; then
-            printf "\033]2;%s\033\\" "''${PWD##*/}"
+            local title
+            if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+              local repo_name branch_name
+              repo_name=$(basename "$(git rev-parse --show-toplevel 2>/dev/null)")
+              branch_name=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
+              title="''${repo_name}(''${branch_name})"
+            else
+              title="''${PWD##*/}"
+            fi
+            printf "\033]2;%s\033\\" "$title"
           fi
         }
         autoload -Uz add-zsh-hook
