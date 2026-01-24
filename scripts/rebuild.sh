@@ -22,4 +22,32 @@ if [ -z "$HOST" ] && [ -f "$USER_CONFIG" ]; then
 fi
 HOST="${HOST:-personal}"
 
-exec darwin-rebuild switch --flake ".#${HOST}" "${OVERRIDE_ARGS[@]}"
+# Determine system type and user
+SYSTEM=""
+USERNAME=""
+if [ -f "$USER_CONFIG" ]; then
+  SYSTEM="$(nix eval --raw --impure --expr "(import $USER_CONFIG).system" 2>/dev/null || true)"
+  USERNAME="$(nix eval --raw --impure --expr "(import $USER_CONFIG).user" 2>/dev/null || true)"
+fi
+
+# Default to darwin if system not specified
+if [ -z "$SYSTEM" ]; then
+  SYSTEM="aarch64-darwin"
+fi
+
+case "$SYSTEM" in
+  *-darwin)
+    exec darwin-rebuild switch --flake ".#${HOST}" "${OVERRIDE_ARGS[@]}"
+    ;;
+  *-linux)
+    if [ -z "$USERNAME" ]; then
+      echo "Error: user not specified in $USER_CONFIG" >&2
+      exit 1
+    fi
+    exec home-manager switch --flake ".#${USERNAME}" "${OVERRIDE_ARGS[@]}"
+    ;;
+  *)
+    echo "Error: Unknown system type: $SYSTEM" >&2
+    exit 1
+    ;;
+esac
