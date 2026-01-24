@@ -168,6 +168,12 @@ keybinds clear-defaults=true {
         // Cmd+Shift+arrows: Move between tabs
         bind "Super Shift left" { GoToPreviousTab; }
         bind "Super Shift right" { GoToNextTab; }
+        // Cmd+C/X/V: Copy and paste
+        bind "Super c" { Copy; }
+        bind "Super x" { Copy; }
+        bind "Super v" {
+            WriteChars "\u{0016}";  // Ctrl+V でペースト
+        }
     }
     shared_except "locked" "move" {
         bind "Ctrl h" { SwitchToMode "move"; }

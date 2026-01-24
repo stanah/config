@@ -81,5 +81,6 @@ keybind = cmd+shift+down=unbind
 keybind = cmd+alt+left=unbind
 keybind = cmd+alt+right=unbind
 keybind = cmd+alt+up=unbind
-keybind = cmd+alt+down=unbind
-
+keybind = cmd+alt+down=unbind# Copy/paste with Cmd key (Ghostty handles these)
+keybind = cmd+c=copy_to_clipboard
+keybind = cmd+v=paste_from_clipboard

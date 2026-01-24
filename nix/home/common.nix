@@ -18,6 +18,7 @@
   home.sessionVariables = {
     GHQ_ROOT = "${config.home.homeDirectory}/work";
     BUN_INSTALL = "${config.home.homeDirectory}/.bun";
+    PNPM_HOME = "${config.home.homeDirectory}/.local/share/pnpm";
     ATUIN_NOBIND = "1";
     EDITOR = "nvim";
     VISUAL = "nvim";
@@ -77,6 +78,7 @@
     "${config.home.homeDirectory}/.bun/bin"
     "${config.home.homeDirectory}/.foundry/bin"
     "${config.home.homeDirectory}/.claude/local"
+    "${config.home.homeDirectory}/.local/share/pnpm"
   ];
 
   programs.git = {
@@ -119,6 +121,12 @@
       "..." = "cd ../..";
     };
     initContent = lib.mkMerge [
+      (lib.mkOrder 500 ''
+        # Source home-manager session variables
+        if [ -f "${config.home.profileDirectory}/etc/profile.d/hm-session-vars.sh" ]; then
+          source "${config.home.profileDirectory}/etc/profile.d/hm-session-vars.sh"
+        fi
+      '')
       (lib.mkOrder 550 ''
         fpath=(${pkgs.zsh-completions}/share/zsh/site-functions $fpath)
       '')
