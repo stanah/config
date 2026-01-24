@@ -119,6 +119,12 @@
       yarnpkg = "pnpm";
       ".." = "cd ..";
       "..." = "cd ../..";
+      # Docker
+      dc = "docker compose";
+      dps = "docker ps";
+      dpsa = "docker ps -a";
+      dlog = "docker logs -f";
+      dexec = "docker exec -it";
     };
     initContent = lib.mkMerge [
       (lib.mkOrder 500 ''
@@ -273,8 +279,10 @@
     zellij
     btop
     lazydocker
-    colima
     docker
+    docker-compose
+  ] ++ lib.optionals stdenv.isDarwin [
+    colima  # macOS only: Linux VM for Docker
   ];
 
   xdg.configFile."sheldon/plugins.toml".text = ''

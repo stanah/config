@@ -20,7 +20,9 @@
       host = userConfig.host;
       system = userConfig.system;
       pkgs = import nixpkgs { inherit system; };
+      isDarwin = builtins.match ".*-darwin" system != null;
       hostProfiles = {
+        # macOS profiles
         personal = {
           darwin = [ ./nix/darwin/personal.nix ];
           home = [ ./nix/home/personal.nix ];
@@ -29,6 +31,11 @@
           darwin = [ ./nix/darwin/work.nix ];
           home = [ ./nix/home/work.nix ];
         };
+        # Linux profiles
+        gpu-server = {
+          darwin = [];
+          home = [ ./nix/home/gpu-server.nix ];
+        };
       };
       selectedProfile =
         if builtins.hasAttr host hostProfiles
@@ -36,26 +43,30 @@
         else throw "Unknown host: ${host}. Add it to hostProfiles.";
     in
     {
-      darwinConfigurations.${host} = darwin.lib.darwinSystem {
-        inherit system;
-        specialArgs = {
-          inherit inputs user;
+      # Darwin configurations (macOS only)
+      darwinConfigurations = if isDarwin then {
+        ${host} = darwin.lib.darwinSystem {
+          inherit system;
+          specialArgs = {
+            inherit inputs user;
+          };
+          modules = [
+            ./nix/darwin/common.nix
+          ] ++ selectedProfile.darwin ++ [
+            home-manager.darwinModules.home-manager
+            {
+              home-manager.useGlobalPkgs = true;
+              home-manager.useUserPackages = true;
+              home-manager.extraSpecialArgs = { inherit inputs user; };
+              home-manager.users.${user} = {
+                imports = [ ./nix/home/common.nix ] ++ selectedProfile.home;
+              };
+            }
+          ];
         };
-        modules = [
-          ./nix/darwin/common.nix
-        ] ++ selectedProfile.darwin ++ [
-          home-manager.darwinModules.home-manager
-          {
-            home-manager.useGlobalPkgs = true;
-            home-manager.useUserPackages = true;
-            home-manager.extraSpecialArgs = { inherit inputs user; };
-            home-manager.users.${user} = {
-              imports = [ ./nix/home/common.nix ] ++ selectedProfile.home;
-            };
-          }
-        ];
-      };
+      } else {};
 
+      # Standalone home-manager configurations (for Linux or standalone macOS use)
       homeConfigurations.${user} = home-manager.lib.homeManagerConfiguration {
         inherit pkgs;
         extraSpecialArgs = {
