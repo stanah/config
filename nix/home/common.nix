@@ -16,11 +16,11 @@
   home.stateVersion = "24.05";
 
   # mise manages language runtimes and their PATH (bun, pnpm, foundry, node, etc.)
-  # PNPM_HOME is required for pnpm global installs
-  # Manual CLI tools (claude, opencode) should configure PATH in ~/.zshrc.local
+  # BUN_INSTALL/PNPM_HOME are required for global package installs
 
   home.sessionVariables = {
     GHQ_ROOT = "${config.home.homeDirectory}/work";
+    BUN_INSTALL = "${config.home.homeDirectory}/.bun";
     PNPM_HOME = "${config.home.homeDirectory}/.local/share/pnpm";
     ATUIN_NOBIND = "1";
     EDITOR = "nvim";
@@ -29,6 +29,7 @@
 
   home.sessionPath = [
     "${config.home.homeDirectory}/.local/bin"
+    "${config.home.homeDirectory}/.bun/bin"
     "${config.home.homeDirectory}/.local/share/pnpm"
   ];
 
