@@ -55,9 +55,9 @@ case "$SYSTEM" in
     nix run github:LnL7/nix-darwin -- switch --flake ".#${HOST}" "${OVERRIDE_ARGS[@]}"
     ;;
   *-linux)
+    # Auto-detect username if not specified
     if [ -z "$USERNAME" ]; then
-      echo "Error: user not specified in $USER_CONFIG" >&2
-      exit 1
+      USERNAME="${SUDO_USER:-$USER}"
     fi
     # home-manager の初回適用
     nix run github:nix-community/home-manager -- switch --flake ".#${USERNAME}" "${OVERRIDE_ARGS[@]}"

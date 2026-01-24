@@ -44,9 +44,9 @@ case "$SYSTEM" in
     exec darwin-rebuild switch --flake ".#${HOST}" "${OVERRIDE_ARGS[@]}"
     ;;
   *-linux)
+    # Auto-detect username if not specified
     if [ -z "$USERNAME" ]; then
-      echo "Error: user not specified in $USER_CONFIG" >&2
-      exit 1
+      USERNAME="${SUDO_USER:-$USER}"
     fi
     exec home-manager switch --flake ".#${USERNAME}" "${OVERRIDE_ARGS[@]}"
     ;;
