@@ -218,6 +218,7 @@
   programs.eza.enable = true;
   programs.bat.enable = true;
   programs.lazygit.enable = true;
+  programs.home-manager.enable = true;
 
   home.packages = with pkgs; [
     dust
