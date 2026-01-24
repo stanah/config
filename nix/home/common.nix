@@ -281,6 +281,7 @@
     lazydocker
     docker
     docker-compose
+    unzip
   ] ++ lib.optionals stdenv.isDarwin [
     colima  # macOS only: Linux VM for Docker
   ];
