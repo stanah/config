@@ -15,12 +15,12 @@
 
   home.stateVersion = "24.05";
 
-  # External tools (mise, bun, pnpm, foundry, claude) manage their own installations.
-  # Nix only configures environment variables and PATH for these tools.
+  # mise manages language runtimes and their PATH (bun, pnpm, foundry, node, etc.)
+  # PNPM_HOME is required for pnpm global installs
+  # Manual CLI tools (claude, opencode) should configure PATH in ~/.zshrc.local
 
   home.sessionVariables = {
     GHQ_ROOT = "${config.home.homeDirectory}/work";
-    BUN_INSTALL = "${config.home.homeDirectory}/.bun";
     PNPM_HOME = "${config.home.homeDirectory}/.local/share/pnpm";
     ATUIN_NOBIND = "1";
     EDITOR = "nvim";
@@ -29,9 +29,6 @@
 
   home.sessionPath = [
     "${config.home.homeDirectory}/.local/bin"
-    "${config.home.homeDirectory}/.bun/bin"
-    "${config.home.homeDirectory}/.foundry/bin"
-    "${config.home.homeDirectory}/.claude/local"
     "${config.home.homeDirectory}/.local/share/pnpm"
   ];
 
