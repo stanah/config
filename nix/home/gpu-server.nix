@@ -10,10 +10,10 @@
   };
 
   home.packages = with pkgs; [
-    # GPU monitoring
-    nvtopPackages.full
-
     # Server utilities
     httpie
+
+    # Note: nvtop is installed via apt to avoid heavy CUDA build in Nix
+    # sudo apt install nvtop
   ];
 }
