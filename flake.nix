@@ -19,7 +19,10 @@
       user = userConfig.user;
       host = userConfig.host;
       system = userConfig.system;
-      pkgs = import nixpkgs { inherit system; };
+      pkgs = import nixpkgs {
+        inherit system;
+        config.allowUnfree = true;
+      };
       isDarwin = builtins.match ".*-darwin" system != null;
       hostProfiles = {
         # macOS profiles
