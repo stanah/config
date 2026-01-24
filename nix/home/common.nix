@@ -15,6 +15,9 @@
 
   home.stateVersion = "24.05";
 
+  # External tools (mise, bun, pnpm, foundry, claude) manage their own installations.
+  # Nix only configures environment variables and PATH for these tools.
+
   home.sessionVariables = {
     GHQ_ROOT = "${config.home.homeDirectory}/work";
     BUN_INSTALL = "${config.home.homeDirectory}/.bun";
@@ -23,55 +26,6 @@
     EDITOR = "nvim";
     VISUAL = "nvim";
   };
-
-  home.activation.miseInstall = lib.hm.dag.entryAfter ["writeBoundary"] ''
-    if [ -x "${pkgs.mise}/bin/mise" ]; then
-      export HOME="${config.home.homeDirectory}"
-      export USER="${config.home.username}"
-      export XDG_CONFIG_HOME="${config.xdg.configHome}"
-      $DRY_RUN_CMD ${pkgs.mise}/bin/mise trust --yes "${config.xdg.configHome}/mise/config.toml"
-      $DRY_RUN_CMD ${pkgs.mise}/bin/mise install --yes
-    fi
-  '';
-
-  home.activation.cliToolsInstall = lib.hm.dag.entryAfter ["miseInstall"] ''
-    export HOME="${config.home.homeDirectory}"
-    export USER="${config.home.username}"
-    export XDG_CONFIG_HOME="${config.xdg.configHome}"
-    export PATH="${pkgs.coreutils}/bin:${pkgs.curl}/bin:${pkgs.wget}/bin:${pkgs.perl}/bin:${config.home.homeDirectory}/.local/bin:/usr/bin:/bin:$PATH"
-
-    if ! command -v claude >/dev/null 2>&1; then
-      $DRY_RUN_CMD ${pkgs.curl}/bin/curl -fsSL https://claude.ai/install.sh | /bin/bash
-    fi
-
-    if ! command -v cursor-agent >/dev/null 2>&1; then
-      $DRY_RUN_CMD ${pkgs.curl}/bin/curl -fsSL https://cursor.com/install | /bin/bash
-    fi
-
-    if ! command -v coderabbit >/dev/null 2>&1; then
-      $DRY_RUN_CMD ${pkgs.curl}/bin/curl -fsSL https://cli.coderabbit.ai/install.sh | /bin/sh
-    fi
-  '';
-
-  home.activation.nvimTreesitterParsers = lib.hm.dag.entryAfter ["writeBoundary"] ''
-    if command -v nvim >/dev/null 2>&1; then
-      parser_dir="$HOME/.local/share/nvim/site/parser"
-      langs=""
-      for lang in markdown markdown_inline html json bash python; do
-        if [ ! -f "$parser_dir/''${lang}.so" ]; then
-          if [ -z "$langs" ]; then
-            langs="'$lang'"
-          else
-            langs="$langs,'$lang'"
-          fi
-        fi
-      done
-
-      if [ -n "$langs" ]; then
-        $DRY_RUN_CMD nvim --headless +"lua require('nvim-treesitter').install({$langs}):wait(300000)" +q
-      fi
-    fi
-  '';
 
   home.sessionPath = [
     "${config.home.homeDirectory}/.local/bin"
