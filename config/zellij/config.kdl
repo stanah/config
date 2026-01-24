@@ -160,11 +160,11 @@ keybinds clear-defaults=true {
         bind "Super Alt down" { Resize "Increase down"; }
         bind "Super Alt up" { Resize "Increase up"; }
         bind "Super Alt right" { Resize "Increase right"; }
-        // Cmd+arrows: Move panes
-        bind "Super left" { MovePane "left"; }
-        bind "Super down" { MovePane "down"; }
-        bind "Super up" { MovePane "up"; }
-        bind "Super right" { MovePane "right"; }
+        // Cmd+arrows: Focus panes (without moving)
+        bind "Super left" { MoveFocus "left"; }
+        bind "Super down" { MoveFocus "down"; }
+        bind "Super up" { MoveFocus "up"; }
+        bind "Super right" { MoveFocus "right"; }
         // Cmd+Shift+arrows: Move between tabs
         bind "Super Shift left" { GoToPreviousTab; }
         bind "Super Shift right" { GoToNextTab; }
