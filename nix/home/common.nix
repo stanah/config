@@ -51,7 +51,7 @@
 
   programs.zsh = {
     enable = true;
-    dotDir = config.home.homeDirectory;
+    dotDir = "${config.xdg.configHome}/zsh-nix";  # Nix管理の設定は別ディレクトリへ（~/.zshrcはツールが書き込み可能）
     enableCompletion = true;
     autosuggestion.enable = false;
     syntaxHighlighting.enable = false;
@@ -198,13 +198,25 @@
         fi
       '')
       (lib.mkOrder 1500 ''
-        # ローカル設定（Git管理外）
-        if [ -f "$HOME/.zshrc.local" ]; then
-          source "$HOME/.zshrc.local"
+        # ユーザーの~/.zshrc（ツールが自由に書き込み可能）
+        if [ -f "$HOME/.zshrc" ]; then
+          source "$HOME/.zshrc"
         fi
       '')
     ];
   };
+
+  # ~/.zshrcが存在しなければ作成
+  home.activation.ensureZshrc = lib.hm.dag.entryAfter ["writeBoundary"] ''
+    if [ ! -f "${config.home.homeDirectory}/.zshrc" ]; then
+      cat > "${config.home.homeDirectory}/.zshrc" << 'ZSHRC'
+# User zsh configuration (tools can write here freely)
+# Nix-managed settings are loaded from ~/.config/zsh-nix/.zshrc
+
+ZSHRC
+      run echo "Created ~/.zshrc"
+    fi
+  '';
 
   programs.starship.enable = true;
   programs.neovim = {
