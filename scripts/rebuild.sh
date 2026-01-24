@@ -30,9 +30,13 @@ if [ -f "$USER_CONFIG" ]; then
   USERNAME="$(nix eval --raw --impure --expr "(import $USER_CONFIG).user" 2>/dev/null || true)"
 fi
 
-# Default to darwin if system not specified
+# Auto-detect system if not specified
 if [ -z "$SYSTEM" ]; then
-  SYSTEM="aarch64-darwin"
+  case "$(uname -s)" in
+    Darwin) SYSTEM="aarch64-darwin" ;;
+    Linux)  SYSTEM="x86_64-linux" ;;
+    *)      echo "Error: Unknown OS: $(uname -s)" >&2; exit 1 ;;
+  esac
 fi
 
 case "$SYSTEM" in
