@@ -107,10 +107,16 @@
 
         # completion: distinguish local dirs vs cdpath (ghq) dirs
         zmodload -i zsh/complist
-        zstyle ':completion:*' descriptions false
-        zstyle ':completion:*:*:cd:*' tag-order local-directories path-directories
-        zstyle ':completion:*' list-colors 'di=1;32'
+        zstyle ':completion:*' descriptions true
+        zstyle ':completion:*:descriptions' format '[%d]'
+        zstyle ':completion:*:*:cd:*' group-order local-directories path-directories
+        if [[ -n "''${LS_COLORS-}" ]]; then
+          zstyle ':completion:*' list-colors ''${(s.:.)LS_COLORS}
+        fi
+        zstyle ':completion:*:*:cd:*:local-directories' list-colors 'di=1;32'
         zstyle ':completion:*:*:cd:*:path-directories' list-colors 'di=1;36'
+        zstyle ':fzf-tab:complete:cd:*' show-group quiet
+        zstyle ':fzf-tab:complete:cd:*' group-colors $'\e[32m' $'\e[36m'
 
         setopt inc_append_history
         setopt share_history
