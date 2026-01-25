@@ -9,6 +9,8 @@
   xdg.configFile."mise/config.toml".source = ../../config/mise-global/config.toml;
   xdg.configFile."starship.toml".source = ../../config/starship/starship.toml;
   xdg.configFile."zellij/config.kdl".source = ../../config/zellij/config.kdl;
+  xdg.configFile."zellij/layouts".source = ../../config/zellij/layouts;
+  xdg.configFile."zellij/layouts".recursive = true;
 
   home.username = user;
   home.homeDirectory = if pkgs.stdenv.isDarwin then "/Users/${user}" else "/home/${user}";
