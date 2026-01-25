@@ -1,5 +1,6 @@
 [tools]
 node = "lts"
+rust = "latest"
 foundry = "1.5.1"
 pnpm = "latest"
 bun = "latest"
