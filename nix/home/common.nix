@@ -95,8 +95,22 @@
           source "${config.xdg.configHome}/private/env"
         fi
 
-        # ghq root shortcut
+        # ghq root shortcut (include all ghq repos)
+        typeset -aU cdpath
         cdpath=("$GHQ_ROOT")
+        if (( $+commands[ghq] )); then
+          local -a ghq_repos ghq_parents
+          ghq_repos=("''${(@f)$(ghq list -p 2>/dev/null)}")
+          ghq_parents=(''${ghq_repos:h})
+          cdpath+=($ghq_parents)
+        fi
+
+        # completion: distinguish local dirs vs cdpath (ghq) dirs
+        zmodload -i zsh/complist
+        zstyle ':completion:*' descriptions false
+        zstyle ':completion:*:*:cd:*' group-order local-directories path-directories
+        zstyle ':completion:*:*:cd:*' list-colors 'di=1;32'
+        zstyle ':completion:*:*:cd:*:path-directories' list-colors 'di=1;36'
 
         setopt inc_append_history
         setopt share_history
