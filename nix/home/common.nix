@@ -271,6 +271,7 @@ ZSHRC
     zsh-completions
     ghq
     gh
+    gh-dash
     perl
     zellij
     btop
