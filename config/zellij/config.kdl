@@ -277,6 +277,7 @@ plugins {
     status-bar location="zellij:status-bar"
     strider location="zellij:strider"
     tab-bar location="zellij:tab-bar"
+    tab-sync location="file:~/.config/zellij/plugins/zellij_tab_sync.wasm"
     welcome-screen location="zellij:session-manager" {
         welcome_screen true
     }
@@ -286,6 +287,7 @@ plugins {
 // eg. "file:/path/to/my-plugin.wasm"
 // eg. "https://example.com/my-plugin.wasm"
 load_plugins {
+    tab-sync
 }
 web_client {
     font "monospace"
