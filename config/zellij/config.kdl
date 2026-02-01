@@ -134,45 +134,42 @@ keybinds clear-defaults=true {
         }
     }
     shared_except "locked" {
-        bind "Alt left" { MoveFocusOrTab "left"; }
-        bind "Alt down" { MoveFocus "down"; }
-        bind "Alt up" { MoveFocus "up"; }
-        bind "Alt right" { MoveFocusOrTab "right"; }
-        bind "Alt +" { Resize "Increase"; }
-        bind "Alt -" { Resize "Decrease"; }
-        bind "Alt =" { Resize "Increase"; }
-        bind "Alt [" { PreviousSwapLayout; }
-        bind "Alt ]" { NextSwapLayout; }
-        bind "Alt f" { ToggleFloatingPanes; }
-        bind "Ctrl g" { SwitchToMode "locked"; }
-        bind "Alt h" { MoveFocusOrTab "left"; }
-        bind "Alt i" { MoveTab "left"; }
+        // === Alt + key: Pane operations ===
+        bind "Alt h" { MoveFocus "left"; }
         bind "Alt j" { MoveFocus "down"; }
         bind "Alt k" { MoveFocus "up"; }
-        bind "Alt l" { MoveFocusOrTab "right"; }
+        bind "Alt l" { MoveFocus "right"; }
+        bind "Alt left" { MoveFocus "left"; }
+        bind "Alt down" { MoveFocus "down"; }
+        bind "Alt up" { MoveFocus "up"; }
+        bind "Alt right" { MoveFocus "right"; }
         bind "Alt n" { NewPane; }
-        bind "Alt o" { MoveTab "right"; }
+        bind "Alt x" { CloseFocus; }
+        bind "Alt f" { ToggleFloatingPanes; }
+        bind "Alt =" { Resize "Increase"; }
+        bind "Alt +" { Resize "Increase"; }
+        bind "Alt -" { Resize "Decrease"; }
+        bind "Alt [" { PreviousSwapLayout; }
+        bind "Alt ]" { NextSwapLayout; }
         bind "Alt p" { TogglePaneInGroup; }
+
+        // === Alt + Shift + key: Tab operations ===
+        bind "Alt Shift left" { GoToPreviousTab; }
+        bind "Alt Shift right" { GoToNextTab; }
+        bind "Alt N" { NewTab; SwitchToMode "normal"; }
+        bind "Alt X" { CloseTab; SwitchToMode "normal"; }
         bind "Alt Shift p" { ToggleGroupMarking; }
+        bind "Alt i" { MoveTab "left"; }
+        bind "Alt o" { MoveTab "right"; }
+
+        // Ctrl
+        bind "Ctrl g" { SwitchToMode "locked"; }
         bind "Ctrl q" { Quit; }
-        // Cmd+Alt+arrows: Resize panes
-        bind "Super Alt left" { Resize "Increase left"; }
-        bind "Super Alt down" { Resize "Increase down"; }
-        bind "Super Alt up" { Resize "Increase up"; }
-        bind "Super Alt right" { Resize "Increase right"; }
-        // Cmd+arrows: Focus panes (without moving)
-        bind "Super left" { MoveFocus "left"; }
-        bind "Super down" { MoveFocus "down"; }
-        bind "Super up" { MoveFocus "up"; }
-        bind "Super right" { MoveFocus "right"; }
-        // Cmd+Shift+arrows: Move between tabs
-        bind "Super Shift left" { GoToPreviousTab; }
-        bind "Super Shift right" { GoToNextTab; }
-        // Cmd+C/X/V: Copy and paste
+
+        // Cmd+C/V: Copy and paste (macOS)
         bind "Super c" { Copy; }
-        bind "Super x" { Copy; }
         bind "Super v" {
-            WriteChars "\u{0016}";  // Ctrl+V でペースト
+            WriteChars "\u{0016}";
         }
     }
     shared_except "locked" "move" {
