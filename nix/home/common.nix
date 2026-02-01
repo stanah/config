@@ -358,9 +358,9 @@ ZSHRC
       set -g pane-border-format "#{?pane_active,#[fg=#{@thm_lavender}#,bold] #P  #{pane_current_command}  #{pane_current_path} #[default],#[fg=#{@thm_surface_2}] #P  #{pane_current_command} #[default]}"
 
       # Window renaming
-      # @workspace-name が設定されていれば「ws:command」形式、なければコマンド名のみ
+      # @workspace-name が設定されていればワークスペース名のみ、なければコマンド名
       set -g automatic-rename on
-      set -g automatic-rename-format "#{?@workspace-name,#{@workspace-name}:#{pane_current_command},#{pane_current_command}}"
+      set -g automatic-rename-format "#{?@workspace-name,#{@workspace-name},#{pane_current_command}}"
       set -g allow-rename on
 
       # Resurrect & Continuum
