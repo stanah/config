@@ -5,6 +5,8 @@ foundry = "1.5.1"
 pnpm = "latest"
 bun = "latest"
 uv = "latest"
+"cargo:https://github.com/itsjunetime/tdf" = "latest"
+"npm:@marp-team/marp-cli" = "latest"
 
 [settings]
 auto_install = true
