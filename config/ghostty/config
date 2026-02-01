@@ -23,18 +23,18 @@ clipboard-trim-trailing-spaces = true
 keybind = ctrl+h=goto_split:left
 keybind = ctrl+l=goto_split:right
 
+# Cmd+Space → C-Space (tmux prefix)
+keybind = cmd+space=text:\x00
+
+# Ghostty native operations (Cmd+S leader)
 keybind = cmd+s>r=reload_config
 keybind = cmd+s>x=close_surface
 keybind = cmd+s>n=new_window
-
-# tabs 
 keybind = cmd+s>c=new_tab
 keybind = cmd+s>shift+l=next_tab
 keybind = cmd+s>shift+h=previous_tab
 keybind = cmd+s>comma=move_tab:-1
 keybind = cmd+s>period=move_tab:1
-
-# quick tab switch
 keybind = cmd+s>1=goto_tab:1
 keybind = cmd+s>2=goto_tab:2
 keybind = cmd+s>3=goto_tab:3
@@ -44,19 +44,31 @@ keybind = cmd+s>6=goto_tab:6
 keybind = cmd+s>7=goto_tab:7
 keybind = cmd+s>8=goto_tab:8
 keybind = cmd+s>9=goto_tab:9
-
-# split
 keybind = cmd+s>\=new_split:right
 keybind = cmd+s>-=new_split:down
-
 keybind = cmd+s>j=goto_split:bottom
 keybind = cmd+s>k=goto_split:top
 keybind = cmd+s>h=goto_split:left
 keybind = cmd+s>l=goto_split:right
-
 keybind = cmd+s>z=toggle_split_zoom
-
 keybind = cmd+s>e=equalize_splits
+
+# === Cmd → tmux: Pane navigation (CSI modifier 9 = Super) ===
+keybind = cmd+left=text:\x1b[1;9D
+keybind = cmd+right=text:\x1b[1;9C
+keybind = cmd+up=text:\x1b[1;9A
+keybind = cmd+down=text:\x1b[1;9B
+
+# === Cmd+Shift → tmux: Tab navigation (CSI modifier 10 = Super+Shift) ===
+keybind = cmd+shift+left=text:\x1b[1;10D
+keybind = cmd+shift+right=text:\x1b[1;10C
+
+# === Cmd → tmux: Operations (CSI u encoding) ===
+keybind = cmd+n=text:\x1b[110;9u
+keybind = cmd+shift+n=text:\x1b[110;10u
+keybind = cmd+x=text:\x1b[120;9u
+keybind = cmd+shift+x=text:\x1b[120;10u
+keybind = cmd+f=text:\x1b[102;9u
 
 
 shell-integration = detect
@@ -69,18 +81,6 @@ quit-after-last-window-closed = true
 # macos-titlebar-style = tabs
 macos-option-as-alt = true
 
-# Unbind cmd+arrow keys to pass through to zellij
-keybind = cmd+left=unbind
-keybind = cmd+right=unbind
-keybind = cmd+up=unbind
-keybind = cmd+down=unbind
-keybind = cmd+shift+left=unbind
-keybind = cmd+shift+right=unbind
-keybind = cmd+shift+up=unbind
-keybind = cmd+shift+down=unbind
-keybind = cmd+alt+left=unbind
-keybind = cmd+alt+right=unbind
-keybind = cmd+alt+up=unbind
-keybind = cmd+alt+down=unbind# Copy/paste with Cmd key (Ghostty handles these)
+# Copy/paste with Cmd key (Ghostty handles these)
 keybind = cmd+c=copy_to_clipboard
 keybind = cmd+v=paste_from_clipboard
