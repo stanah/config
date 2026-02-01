@@ -55,6 +55,9 @@
     enable = true;
     dotDir = "${config.xdg.configHome}/zsh-nix";  # Nix管理の設定は別ディレクトリへ（~/.zshrcはツールが書き込み可能）
     enableCompletion = true;
+    profileExtra = lib.optionalString pkgs.stdenv.isDarwin ''
+      eval "$(/opt/homebrew/bin/brew shellenv)"
+    '';
     autosuggestion.enable = false;
     syntaxHighlighting.enable = false;
     history = {
@@ -194,23 +197,31 @@
           eval "$("${pkgs.sheldon}/bin/sheldon" source)"
         fi
 
-        # Update Zellij pane title with repository name and branch (or directory name)
-        __zellij_update_title() {
+        # Update pane/window title with repository name and branch (supports Zellij and tmux)
+        __update_pane_title() {
+          local title
+          if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+            local repo_name branch_name
+            repo_name=$(basename "$(git rev-parse --show-toplevel 2>/dev/null)")
+            branch_name=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
+            title="''${repo_name}(''${branch_name})"
+          else
+            title="''${PWD##*/}"
+          fi
+
           if [ -n "$ZELLIJ" ]; then
-            local title
-            if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
-              local repo_name branch_name
-              repo_name=$(basename "$(git rev-parse --show-toplevel 2>/dev/null)")
-              branch_name=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
-              title="''${repo_name}(''${branch_name})"
-            else
-              title="''${PWD##*/}"
-            fi
             printf "\033]2;%s\033\\" "$title"
+          elif [ -n "$TMUX" ]; then
+            # workspace-manager 管理ウィンドウは automatic-rename-format に任せる
+            local ws_name
+            ws_name=$(tmux show-window-option -v @workspace-name 2>/dev/null)
+            if [ -z "$ws_name" ]; then
+              tmux rename-window "$title"
+            fi
           fi
         }
         autoload -Uz add-zsh-hook
-        add-zsh-hook precmd __zellij_update_title
+        add-zsh-hook precmd __update_pane_title
 
         __bindkey_apply
       '')
@@ -239,6 +250,128 @@ ZSHRC
       run echo "Created ~/.zshrc"
     fi
   '';
+
+  programs.tmux = {
+    enable = true;
+    prefix = "C-Space";
+    keyMode = "vi";
+    mouse = true;
+    baseIndex = 1;
+    escapeTime = 0;
+    historyLimit = 50000;
+    terminal = "tmux-256color";
+    plugins = with pkgs.tmuxPlugins; [
+      sensible
+      yank
+      vim-tmux-navigator
+      {
+        plugin = catppuccin;
+        extraConfig = ''
+          set -g @catppuccin_window_text ' #W'
+          set -g @catppuccin_window_current_text ' #W'
+        '';
+      }
+      resurrect
+      continuum
+    ];
+    extraConfig = ''
+      # True color support
+      set -ag terminal-overrides ",xterm-256color:RGB"
+      set -ag terminal-overrides ",*256col*:Tc"
+
+      # Undercurl support
+      set -as terminal-overrides ',*:Smulx=\E[4::%p1%dm'
+      set -as terminal-overrides ',*:Setulc=\E[58::2::%p1%{65536}%/%d::%p1%{256}%/%{255}%&%d::%p1%{255}%&%d%;m'
+
+      # Pane splitting (unified with zellij tmux mode: % = right, " = down)
+      bind % split-window -h -c "#{pane_current_path}"
+      bind '"' split-window -v -c "#{pane_current_path}"
+      # Additional intuitive bindings
+      bind | split-window -h -c "#{pane_current_path}"
+      bind - split-window -v -c "#{pane_current_path}"
+      bind c new-window -c "#{pane_current_path}"
+
+      # Vi-style pane navigation (same as zellij tmux mode h/j/k/l)
+      bind h select-pane -L
+      bind j select-pane -D
+      bind k select-pane -U
+      bind l select-pane -R
+
+      # Pane resizing (matches zellij resize mode H/J/K/L = decrease)
+      bind -r H resize-pane -L 5
+      bind -r J resize-pane -D 5
+      bind -r K resize-pane -U 5
+      bind -r L resize-pane -R 5
+
+      # Vi copy mode
+      bind -T copy-mode-vi v send-keys -X begin-selection
+      bind -T copy-mode-vi y send-keys -X copy-selection-and-cancel
+      bind -T copy-mode-vi C-v send-keys -X rectangle-toggle
+
+      # === Cmd key support (via Ghostty escape sequences) ===
+      # Ghostty sends CSI with modifier 9 (Super) / 10 (Super+Shift)
+
+      # Pane navigation: Cmd+arrows
+      set -s user-keys[0] "\e[1;9D"    # Cmd+Left
+      set -s user-keys[1] "\e[1;9C"    # Cmd+Right
+      set -s user-keys[2] "\e[1;9A"    # Cmd+Up
+      set -s user-keys[3] "\e[1;9B"    # Cmd+Down
+      bind -n User0 select-pane -L
+      bind -n User1 select-pane -R
+      bind -n User2 select-pane -U
+      bind -n User3 select-pane -D
+
+      # Tab navigation: Cmd+Shift+arrows
+      set -s user-keys[4] "\e[1;10D"   # Cmd+Shift+Left
+      set -s user-keys[5] "\e[1;10C"   # Cmd+Shift+Right
+      bind -n User4 previous-window
+      bind -n User5 next-window
+
+      # Pane operations: Cmd+n (split), Cmd+x (close), Cmd+f (zoom)
+      set -s user-keys[6] "\e[110;9u"  # Cmd+n
+      set -s user-keys[7] "\e[120;9u"  # Cmd+x
+      set -s user-keys[8] "\e[102;9u"  # Cmd+f
+      bind -n User6 split-window -h -c "#{pane_current_path}"
+      bind -n User7 kill-pane
+      bind -n User8 resize-pane -Z
+
+      # Tab operations: Cmd+Shift+n (new tab), Cmd+Shift+x (close tab)
+      set -s user-keys[9] "\e[110;10u"  # Cmd+Shift+n
+      set -s user-keys[10] "\e[120;10u" # Cmd+Shift+x
+      bind -n User9 new-window -c "#{pane_current_path}"
+      bind -n User10 kill-window
+
+      # Catppuccin theme
+      set -g @catppuccin_flavor 'mocha'
+      set -g @catppuccin_window_status_style 'rounded'
+
+      # Status bar
+      set -g status-position top
+      set -g status-interval 5
+      set -g status-left-length 30
+      set -g status-left "#{E:@catppuccin_status_session}"
+      set -g status-right "#{E:@catppuccin_status_application}"
+      set -agF status-right "#{E:@catppuccin_status_date_time}"
+
+      # Pane borders
+      set -g pane-border-status top
+      set -g pane-border-format "#{?pane_active,#[fg=#{@thm_lavender}#,bold] #P  #{pane_current_command}  #{pane_current_path} #[default],#[fg=#{@thm_surface_2}] #P  #{pane_current_command} #[default]}"
+
+      # Window renaming
+      # @workspace-name が設定されていれば「ws:command」形式、なければコマンド名のみ
+      set -g automatic-rename on
+      set -g automatic-rename-format "#{?@workspace-name,#{@workspace-name}:#{pane_current_command},#{pane_current_command}}"
+      set -g allow-rename on
+
+      # Resurrect & Continuum
+      set -g @resurrect-capture-pane-contents 'on'
+      set -g @continuum-restore 'on'
+      set -g @continuum-save-interval '15'
+
+      # Focus events for neovim
+      set -g focus-events on
+    '';
+  };
 
   programs.starship.enable = true;
   programs.neovim = {
@@ -269,6 +402,7 @@ ZSHRC
     yazi
     mise
     zsh-completions
+    coreutils
     ghq
     gh
     gh-dash
