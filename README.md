@@ -87,8 +87,9 @@ vim ~/.config/private/env
 ## メモ
 
 - chezmoi の source はリポジトリ直下です。`nix/` や `flake.nix` は `.chezmoiignore` で除外しています。
-- darwin の適用は `sudo -H darwin-rebuild switch --flake '.#personal'` で実行できます。
-- スクリプト経由なら `sudo -H ./scripts/rebuild.sh` を使えます（`nix/user-config.nix` の `host` を参照）。
+- **ユーザー設定のみ変更**（tmux, zsh, starship 等）: `./scripts/hm-switch.sh`（sudo 不要）
+- **システム全体を再構築**（launchd, system defaults 等）: `sudo -H ./scripts/rebuild.sh`
+- `darwin-rebuild` を直接実行する場合: `sudo -H darwin-rebuild switch --flake '.#personal'`
 - 既存設定をリポジトリへ反映する場合は `scripts/sync-config.sh` を実行してください。
 
 ## 設定の同期手順（実機 → リポジトリ）
