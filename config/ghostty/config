@@ -63,12 +63,13 @@ keybind = cmd+down=text:\x1b[1;9B
 keybind = cmd+shift+left=text:\x1b[1;10D
 keybind = cmd+shift+right=text:\x1b[1;10C
 
-# === Cmd → tmux: Operations (CSI u encoding) ===
-keybind = cmd+n=text:\x1b[110;9u
-keybind = cmd+shift+n=text:\x1b[110;10u
-keybind = cmd+x=text:\x1b[120;9u
-keybind = cmd+shift+x=text:\x1b[120;10u
-keybind = cmd+f=text:\x1b[102;9u
+# === Cmd → tmux: Operations (CSI ~ encoding for user-keys compat) ===
+keybind = cmd+n=text:\x1b[110;9~
+keybind = cmd+shift+n=text:\x1b[110;10~
+keybind = cmd+x=text:\x1b[120;9~
+keybind = cmd+shift+x=text:\x1b[120;10~
+keybind = cmd+f=text:\x1b[102;9~
+keybind = cmd+g=text:\x1b[103;9~
 
 
 shell-integration = detect

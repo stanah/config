@@ -98,6 +98,18 @@
           source "${config.xdg.configHome}/private/env"
         fi
 
+        # ghq + fzf: fuzzy-find and cd into a ghq repository
+        function ghq-fzf() {
+          local repo
+          repo=$(ghq list | fzf --preview "bat --color=always --style=plain $(ghq root)/{}/README.md 2>/dev/null || eza --icons --git -la $(ghq root)/{}" --preview-window=right:50%)
+          if [[ -n "$repo" ]]; then
+            BUFFER="cd -- $(ghq root)/$repo"
+            zle accept-line
+          fi
+          zle reset-prompt
+        }
+        zle -N ghq-fzf
+
         # ghq root shortcut (include all ghq repos)
         typeset -aU cdpath
         cdpath=("$GHQ_ROOT")
@@ -230,6 +242,11 @@
           __bindkey_apply
         fi
       '')
+      (lib.mkOrder 1400 ''
+        # Keybindings that must be set after __bindkey_apply (mkOrder 1300)
+        bindkey '^g' ghq-fzf
+        bindkey '\e[103;9~' ghq-fzf  # Cmd+g (via Ghostty/tmux)
+      '')
       (lib.mkOrder 1500 ''
         # ユーザーの~/.zshrc（ツールが自由に書き込み可能）
         if [ -f "$HOME/.zshrc" ]; then
@@ -279,6 +296,8 @@ ZSHRC
       set -ag terminal-overrides ",xterm-256color:RGB"
       set -ag terminal-overrides ",*256col*:Tc"
 
+      # Note: extended-keys intentionally off; Cmd+key uses custom CSI ~ sequences via user-keys
+
       # Undercurl support
       set -as terminal-overrides ',*:Smulx=\E[4::%p1%dm'
       set -as terminal-overrides ',*:Setulc=\E[58::2::%p1%{65536}%/%d::%p1%{256}%/%{255}%&%d::%p1%{255}%&%d%;m'
@@ -312,6 +331,9 @@ ZSHRC
       bind -T copy-mode-vi y send-keys -X copy-selection-and-cancel
       bind -T copy-mode-vi C-v send-keys -X rectangle-toggle
 
+      # Mouse drag selection → clipboard copy
+      bind -T copy-mode-vi MouseDragEnd1Pane send-keys -X copy-pipe-and-cancel "pbcopy"
+
       # === Cmd key support (via Ghostty escape sequences) ===
       # Ghostty sends CSI with modifier 9 (Super) / 10 (Super+Shift)
 
@@ -332,16 +354,20 @@ ZSHRC
       bind -n User5 next-window
 
       # Pane operations: Cmd+n (split), Cmd+x (close), Cmd+f (zoom)
-      set -s user-keys[6] "\e[110;9u"  # Cmd+n
-      set -s user-keys[7] "\e[120;9u"  # Cmd+x
-      set -s user-keys[8] "\e[102;9u"  # Cmd+f
+      set -s user-keys[6] "\e[110;9~"  # Cmd+n
+      set -s user-keys[7] "\e[120;9~"  # Cmd+x
+      set -s user-keys[8] "\e[102;9~"  # Cmd+f
       bind -n User6 split-window -h -c "#{pane_current_path}"
       bind -n User7 kill-pane
       bind -n User8 resize-pane -Z
 
+      # ghq fuzzy finder: Cmd+g → send Ctrl+g to trigger zsh widget
+      set -s user-keys[11] "\e[103;9~" # Cmd+g
+      bind -n User11 send-keys C-g
+
       # Tab operations: Cmd+Shift+n (new tab), Cmd+Shift+x (close tab)
-      set -s user-keys[9] "\e[110;10u"  # Cmd+Shift+n
-      set -s user-keys[10] "\e[120;10u" # Cmd+Shift+x
+      set -s user-keys[9] "\e[110;10~"  # Cmd+Shift+n
+      set -s user-keys[10] "\e[120;10~" # Cmd+Shift+x
       bind -n User9 new-window -c "#{pane_current_path}"
       bind -n User10 kill-window
 
