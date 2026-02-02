@@ -303,6 +303,10 @@ ZSHRC
       bind -r K resize-pane -U 5
       bind -r L resize-pane -R 5
 
+      # Mouse: double-click = equalize panes, triple-click = cycle layout
+      bind -T root DoubleClick1Pane select-layout -E
+      bind -T root TripleClick1Pane next-layout
+
       # Vi copy mode
       bind -T copy-mode-vi v send-keys -X begin-selection
       bind -T copy-mode-vi y send-keys -X copy-selection-and-cancel
