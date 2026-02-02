@@ -400,6 +400,114 @@ ZSHRC
 
       # Focus events for neovim
       set -g focus-events on
+
+      # Gather/Scatter: Cmd+\ で AI エージェント系ペインを一時集約/復帰
+      set -s user-keys[12] "\e[92;9~"
+      bind -n User12 run-shell "${pkgs.writeShellScript "tmux-gather" ''
+        TARGETS="claude|kiro|codex|aider|cursor"
+        overview_win=$(tmux show-environment -g GATHER_OVERVIEW_WIN 2>/dev/null | cut -d= -f2)
+
+        if [ -n "$overview_win" ] && tmux list-windows -F "#{window_id}" | grep -qF "$overview_win"; then
+          # === Scatter ===
+          mapping=$(tmux show-environment -g GATHER_MAPPING 2>/dev/null | cut -d= -f2-)
+          layouts=$(tmux show-environment -g GATHER_LAYOUTS 2>/dev/null | cut -d= -f2-)
+          pane_orders=$(tmux show-environment -g GATHER_PANE_ORDERS 2>/dev/null | cut -d= -f2-)
+          IFS="|"
+          for entry in $mapping; do
+            p_id=$(echo "$entry" | cut -d, -f1)
+            w_id=$(echo "$entry" | cut -d, -f2)
+            if tmux list-panes -t "$p_id" -F "#{pane_id}" 2>/dev/null | grep -q .; then
+              tmux move-pane -d -s "$p_id" -t "$w_id" 2>/dev/null
+            fi
+          done
+          # Restore original pane order per window
+          echo "$pane_orders" | tr '|' '\n' > /tmp/tmux-gather-orders
+          while IFS= read -r oentry; do
+            o_wid=$(echo "$oentry" | cut -d= -f1)
+            o_order=$(echo "$oentry" | cut -d= -f2-)
+            idx=0
+            IFS=' '
+            for expected_pane in $(echo "$o_order" | tr ',' ' '); do
+              current_pane=$(tmux list-panes -t "$o_wid" -F "#{pane_id}" 2>/dev/null | sed -n "$((idx+1))p")
+              if [ -n "$current_pane" ] && [ "$current_pane" != "$expected_pane" ]; then
+                tmux swap-pane -d -s "$expected_pane" -t "$current_pane" 2>/dev/null
+              fi
+              idx=$((idx+1))
+            done
+          done < /tmp/tmux-gather-orders
+          # Restore original layouts
+          echo "$layouts" | tr '|' '\n' > /tmp/tmux-gather-layouts
+          while IFS= read -r lentry; do
+            l_wid=$(echo "$lentry" | cut -d, -f1)
+            l_layout=$(echo "$lentry" | cut -d, -f2-)
+            tmux select-layout -t "$l_wid" "$l_layout" 2>/dev/null
+          done < /tmp/tmux-gather-layouts
+          rm -f /tmp/tmux-gather-orders /tmp/tmux-gather-layouts
+          tmux kill-window -t "$overview_win" 2>/dev/null
+          tmux set-environment -g -u GATHER_OVERVIEW_WIN
+          tmux set-environment -g -u GATHER_MAPPING
+          tmux set-environment -g -u GATHER_LAYOUTS
+          tmux set-environment -g -u GATHER_PANE_ORDERS
+          tmux display-message "Panes scattered back"
+        else
+          # === Gather ===
+          mapping=""
+          pane_ids=""
+          layouts=""
+          pane_orders=""
+          saved_windows=""
+          all_procs=$(ps -eo pid=,ppid=,comm=)
+
+          for pane_info in $(tmux list-panes -s -F "#{pane_id}:#{pane_pid}:#{window_id}"); do
+            pid=$(echo "$pane_info" | cut -d: -f2)
+            found=$(echo "$all_procs" | awk -v root="$pid" -v pat="$TARGETS" '
+              BEGIN { pids[root]=1 }
+              { if ($2 in pids) { pids[$1]=1; if (tolower($3) ~ pat) { print $3; exit } } }
+            ')
+            if [ -n "$found" ]; then
+              p_id=$(echo "$pane_info" | cut -d: -f1)
+              w_id=$(echo "$pane_info" | cut -d: -f3)
+              mapping="''${mapping:+$mapping|}$p_id,$w_id"
+              pane_ids="$pane_ids $p_id"
+              # Save window layout and pane order (once per window)
+              case "$saved_windows" in
+                *"$w_id"*) ;;
+                *)
+                  w_layout=$(tmux display-message -t "$w_id" -p "#{window_layout}")
+                  layouts="''${layouts:+$layouts|}$w_id,$w_layout"
+                  w_panes=$(tmux list-panes -t "$w_id" -F "#{pane_id}" | tr '\n' ',' | sed 's/,$//')
+                  pane_orders="''${pane_orders:+$pane_orders|}$w_id=$w_panes"
+                  saved_windows="$saved_windows $w_id"
+                  ;;
+              esac
+            fi
+          done
+
+          if [ -z "$pane_ids" ]; then
+            tmux display-message "No agent panes found"
+            exit 0
+          fi
+
+          overview_win=$(tmux new-window -d -n "agents-overview" -P -F "#{window_id}")
+          first=1
+          for p_id in $pane_ids; do
+            if [ "$first" = 1 ]; then
+              tmux move-pane -d -s "$p_id" -t "$overview_win"
+              first=0
+            else
+              tmux join-pane -d -s "$p_id" -t "$overview_win"
+            fi
+          done
+          tmux select-layout -t "$overview_win" tiled
+          tmux set-environment -g GATHER_OVERVIEW_WIN "$overview_win"
+          tmux set-environment -g GATHER_MAPPING "$mapping"
+          tmux set-environment -g GATHER_LAYOUTS "$layouts"
+          tmux set-environment -g GATHER_PANE_ORDERS "$pane_orders"
+          tmux select-window -t "$overview_win"
+          count=$(echo $pane_ids | wc -w | tr -d " ")
+          tmux display-message "Gathered $count agent panes"
+        fi
+      ''}"
     '';
   };
 

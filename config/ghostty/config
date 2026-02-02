@@ -70,6 +70,7 @@ keybind = cmd+x=text:\x1b[120;9~
 keybind = cmd+shift+x=text:\x1b[120;10~
 keybind = cmd+f=text:\x1b[102;9~
 keybind = cmd+g=text:\x1b[103;9~
+keybind = cmd+backslash=text:\x1b[92;9~
 
 
 shell-integration = detect
