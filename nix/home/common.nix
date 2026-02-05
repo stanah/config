@@ -420,6 +420,11 @@ ZSHRC
               tmux move-pane -d -s "$p_id" -t "$w_id" 2>/dev/null
             fi
           done
+          # Kill placeholder panes that kept windows alive during gather
+          placeholders=$(tmux show-environment -g GATHER_PLACEHOLDERS 2>/dev/null | cut -d= -f2-)
+          for ph in $placeholders; do
+            [ -n "$ph" ] && tmux kill-pane -t "$ph" 2>/dev/null
+          done
           # Restore original pane order per window
           echo "$pane_orders" | tr '|' '\n' > /tmp/tmux-gather-orders
           while IFS= read -r oentry; do
@@ -443,12 +448,19 @@ ZSHRC
             tmux select-layout -t "$l_wid" "$l_layout" 2>/dev/null
           done < /tmp/tmux-gather-layouts
           rm -f /tmp/tmux-gather-orders /tmp/tmux-gather-layouts
-          tmux kill-window -t "$overview_win" 2>/dev/null
+          remaining=$(tmux list-panes -t "$overview_win" -F x 2>/dev/null | wc -l | tr -d ' ')
+          if [ "''${remaining:-0}" -gt 0 ]; then
+            tmux rename-window -t "$overview_win" "orphaned-panes"
+            tmux display-message "Scattered ($remaining orphaned panes remain)"
+          else
+            tmux kill-window -t "$overview_win" 2>/dev/null
+            tmux display-message "Panes scattered back"
+          fi
           tmux set-environment -g -u GATHER_OVERVIEW_WIN
           tmux set-environment -g -u GATHER_MAPPING
           tmux set-environment -g -u GATHER_LAYOUTS
           tmux set-environment -g -u GATHER_PANE_ORDERS
-          tmux display-message "Panes scattered back"
+          tmux set-environment -g -u GATHER_PLACEHOLDERS
         else
           # === Gather ===
           mapping=""
@@ -488,6 +500,17 @@ ZSHRC
             exit 0
           fi
 
+          # Create placeholder panes for windows that would become empty
+          placeholders=""
+          for w_id in $(echo "$mapping" | tr '|' '\n' | cut -d, -f2 | sort -u); do
+            total=$(tmux list-panes -t "$w_id" -F x 2>/dev/null | wc -l | tr -d ' ')
+            agents=$(echo "$mapping" | tr '|' '\n' | grep ",$w_id$" | wc -l | tr -d ' ')
+            if [ "$total" -le "$agents" ]; then
+              ph=$(tmux split-window -d -t "$w_id" -P -F "#{pane_id}" "sleep infinity")
+              placeholders="''${placeholders:+$placeholders|}$ph"
+            fi
+          done
+
           overview_win=$(tmux new-window -d -n "agents-overview" -P -F "#{window_id}")
           first=1
           for p_id in $pane_ids; do
@@ -503,6 +526,7 @@ ZSHRC
           tmux set-environment -g GATHER_MAPPING "$mapping"
           tmux set-environment -g GATHER_LAYOUTS "$layouts"
           tmux set-environment -g GATHER_PANE_ORDERS "$pane_orders"
+          tmux set-environment -g GATHER_PLACEHOLDERS "$placeholders"
           tmux select-window -t "$overview_win"
           count=$(echo $pane_ids | wc -w | tr -d " ")
           tmux display-message "Gathered $count agent panes"
