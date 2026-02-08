@@ -310,11 +310,11 @@ ZSHRC
       bind - split-window -v -c "#{pane_current_path}"
       bind c new-window -c "#{pane_current_path}"
 
-      # Vi-style pane navigation (same as zellij tmux mode h/j/k/l)
-      bind h select-pane -L
-      bind j select-pane -D
-      bind k select-pane -U
-      bind l select-pane -R
+      # Vi-style pane navigation (same as zellij tmux mode h/j/k/l, no wrap)
+      bind h if -F '#{pane_at_left}' '' 'select-pane -L'
+      bind j if -F '#{pane_at_bottom}' '' 'select-pane -D'
+      bind k if -F '#{pane_at_top}' '' 'select-pane -U'
+      bind l if -F '#{pane_at_right}' '' 'select-pane -R'
 
       # Pane resizing (matches zellij resize mode H/J/K/L = decrease)
       bind -r H resize-pane -L 5
@@ -337,21 +337,21 @@ ZSHRC
       # === Cmd key support (via Ghostty escape sequences) ===
       # Ghostty sends CSI with modifier 9 (Super) / 10 (Super+Shift)
 
-      # Pane navigation: Cmd+arrows
+      # Pane navigation: Cmd+arrows (no wrap)
       set -s user-keys[0] "\e[1;9D"    # Cmd+Left
       set -s user-keys[1] "\e[1;9C"    # Cmd+Right
       set -s user-keys[2] "\e[1;9A"    # Cmd+Up
       set -s user-keys[3] "\e[1;9B"    # Cmd+Down
-      bind -n User0 select-pane -L
-      bind -n User1 select-pane -R
-      bind -n User2 select-pane -U
-      bind -n User3 select-pane -D
+      bind -n User0 if -F '#{pane_at_left}' '' 'select-pane -L'
+      bind -n User1 if -F '#{pane_at_right}' '' 'select-pane -R'
+      bind -n User2 if -F '#{pane_at_top}' '' 'select-pane -U'
+      bind -n User3 if -F '#{pane_at_bottom}' '' 'select-pane -D'
 
-      # Tab navigation: Cmd+Shift+arrows
+      # Tab navigation: Cmd+Shift+arrows (no wrap)
       set -s user-keys[4] "\e[1;10D"   # Cmd+Shift+Left
       set -s user-keys[5] "\e[1;10C"   # Cmd+Shift+Right
-      bind -n User4 previous-window
-      bind -n User5 next-window
+      bind -n User4 if-shell "test #{window_index} != $(tmux list-windows -F '##{window_index}' | head -1)" previous-window
+      bind -n User5 if-shell "test #{window_index} != $(tmux list-windows -F '##{window_index}' | tail -1)" next-window
 
       # Pane operations: Cmd+n (split), Cmd+x (close), Cmd+f (zoom)
       set -s user-keys[6] "\e[110;9~"  # Cmd+n
