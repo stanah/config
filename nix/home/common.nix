@@ -224,8 +224,10 @@
           if [ -n "$ZELLIJ" ]; then
             printf "\033]2;%s\033\\" "$title"
           elif [ -n "$TMUX" ]; then
-            # ペインタイトルにgitリポジトリ名/ブランチ or ディレクトリ名を設定
-            printf '\033]2;%s\033\\' "$title"
+            # リポジトリ名をper-pane変数に保存（エージェントがpane_titleを上書きしても維持）
+            tmux set-option -p @repo_name "$title"
+            # pane_titleをクリア（エージェントが自由に設定できるようにする）
+            printf '\033]2;\033\\'
             # workspace-manager 管理ウィンドウは automatic-rename-format に任せる
             local ws_name
             ws_name=$(tmux show-window-option -v @workspace-name 2>/dev/null)
@@ -389,7 +391,7 @@ ZSHRC
       set -g pane-border-status top
       set -g pane-active-border-style "fg=#{@thm_lavender}"
       set -g pane-border-style "fg=#{@thm_surface_1}"
-      set -g pane-border-format "#{?pane_active,#[fg=#{@thm_lavender}#,bold] ● #P  #{pane_title}  #{pane_current_command} #[default],#[fg=#{@thm_overlay_1}]   #P  #{pane_title}  #{pane_current_command} #[default]}"
+      set -g pane-border-format "#{?pane_active,#[fg=#{@thm_lavender}#,bold] ● #P  #{?#{@repo_name},#{@repo_name}#{?#{pane_title}, #{pane_title},},#{pane_title}}  #{pane_current_command} #[default],#[fg=#{@thm_overlay_1}]   #P  #{?#{@repo_name},#{@repo_name}#{?#{pane_title}, #{pane_title},},#{pane_title}}  #{pane_current_command} #[default]}"
 
       # Window renaming
       # @workspace-name が設定されていればワークスペース名のみ、なければコマンド名
@@ -472,13 +474,34 @@ ZSHRC
           layouts=""
           pane_orders=""
           saved_windows=""
-          all_procs=$(ps -eo pid=,ppid=,comm=)
+          all_procs=$(ps -eo pid=,ppid=,args=)
 
           for pane_info in $(tmux list-panes -s -F "#{pane_id}:#{pane_pid}:#{window_id}"); do
             pid=$(echo "$pane_info" | cut -d: -f2)
             found=$(echo "$all_procs" | awk -v root="$pid" -v pat="$TARGETS" '
-              BEGIN { pids[root]=1 }
-              { if ($2 in pids) { pids[$1]=1; if (tolower($3) ~ pat) { print $3; exit } } }
+              {
+                pp[$1]=$2
+                n=split($3,a,"/"); bn[$1]=a[n]
+                arg2[$1]=""
+                if(substr($4,1,1)=="/") arg2[$1]=$4
+              }
+              END {
+                pids[root]=1
+                for(pass=0;pass<5;pass++){
+                  changed=0
+                  for(p in pp){
+                    if((p in pids)==0 && (pp[p] in pids)){
+                      pids[p]=1; changed=1
+                    }
+                  }
+                  if(changed==0) break
+                }
+                for(p in pids){
+                  if(tolower(bn[p]) ~ pat || tolower(arg2[p]) ~ pat){
+                    print bn[p]; exit
+                  }
+                }
+              }
             ')
             if [ -n "$found" ]; then
               p_id=$(echo "$pane_info" | cut -d: -f1)
@@ -524,17 +547,18 @@ ZSHRC
               tmux kill-pane -t "$default_pane" 2>/dev/null
               first=0
             else
-              tmux join-pane -d -s "$p_id" -t "$overview_win"
+              tmux join-pane -d -s "$p_id" -t "$overview_win" 2>/dev/null \
+                || tmux join-pane -dh -s "$p_id" -t "$overview_win" 2>/dev/null
             fi
+            tmux select-layout -t "$overview_win" tiled 2>/dev/null
           done
-          tmux select-layout -t "$overview_win" tiled
           tmux set-environment -g GATHER_OVERVIEW_WIN "$overview_win"
           tmux set-environment -g GATHER_MAPPING "$mapping"
           tmux set-environment -g GATHER_LAYOUTS "$layouts"
           tmux set-environment -g GATHER_PANE_ORDERS "$pane_orders"
           tmux set-environment -g GATHER_PLACEHOLDERS "$placeholders"
           tmux select-window -t "$overview_win"
-          count=$(echo $pane_ids | wc -w | tr -d " ")
+          count=$(tmux list-panes -t "$overview_win" -F x 2>/dev/null | wc -l | tr -d " ")
           tmux display-message "Gathered $count agent panes"
         fi
       ''}"
