@@ -396,7 +396,7 @@ ZSHRC
       # Active pane: opaque background to stand out
       # Non-active panes: transparent (terminal default) to recede
       set -g window-style "bg=default"
-      set -gF window-active-style "bg=#{@thm_bg}"
+      set -g window-active-style "bg=#121212"
 
       # Window renaming
       # @workspace-name が設定されていればワークスペース名のみ、なければコマンド名
