@@ -224,6 +224,8 @@
           if [ -n "$ZELLIJ" ]; then
             printf "\033]2;%s\033\\" "$title"
           elif [ -n "$TMUX" ]; then
+            # ペインタイトルにgitリポジトリ名/ブランチ or ディレクトリ名を設定
+            printf '\033]2;%s\033\\' "$title"
             # workspace-manager 管理ウィンドウは automatic-rename-format に任せる
             local ws_name
             ws_name=$(tmux show-window-option -v @workspace-name 2>/dev/null)
@@ -311,10 +313,10 @@ ZSHRC
       bind c new-window -c "#{pane_current_path}"
 
       # Vi-style pane navigation (same as zellij tmux mode h/j/k/l, no wrap)
-      bind h if -F '#{pane_at_left}' '' 'select-pane -L'
-      bind j if -F '#{pane_at_bottom}' '' 'select-pane -D'
-      bind k if -F '#{pane_at_top}' '' 'select-pane -U'
-      bind l if -F '#{pane_at_right}' '' 'select-pane -R'
+      bind h if -F '#{pane_at_left}' "" 'select-pane -L'
+      bind j if -F '#{pane_at_bottom}' "" 'select-pane -D'
+      bind k if -F '#{pane_at_top}' "" 'select-pane -U'
+      bind l if -F '#{pane_at_right}' "" 'select-pane -R'
 
       # Pane resizing (matches zellij resize mode H/J/K/L = decrease)
       bind -r H resize-pane -L 5
@@ -342,10 +344,10 @@ ZSHRC
       set -s user-keys[1] "\e[1;9C"    # Cmd+Right
       set -s user-keys[2] "\e[1;9A"    # Cmd+Up
       set -s user-keys[3] "\e[1;9B"    # Cmd+Down
-      bind -n User0 if -F '#{pane_at_left}' '' 'select-pane -L'
-      bind -n User1 if -F '#{pane_at_right}' '' 'select-pane -R'
-      bind -n User2 if -F '#{pane_at_top}' '' 'select-pane -U'
-      bind -n User3 if -F '#{pane_at_bottom}' '' 'select-pane -D'
+      bind -n User0 if -F '#{pane_at_left}' "" 'select-pane -L'
+      bind -n User1 if -F '#{pane_at_right}' "" 'select-pane -R'
+      bind -n User2 if -F '#{pane_at_top}' "" 'select-pane -U'
+      bind -n User3 if -F '#{pane_at_bottom}' "" 'select-pane -D'
 
       # Tab navigation: Cmd+Shift+arrows (no wrap)
       set -s user-keys[4] "\e[1;10D"   # Cmd+Shift+Left
@@ -385,7 +387,9 @@ ZSHRC
 
       # Pane borders
       set -g pane-border-status top
-      set -g pane-border-format "#{?pane_active,#[fg=#{@thm_lavender}#,bold] #P  #{pane_current_command}  #{pane_current_path} #[default],#[fg=#{@thm_surface_2}] #P  #{pane_current_command} #[default]}"
+      set -g pane-active-border-style "fg=#{@thm_lavender}"
+      set -g pane-border-style "fg=#{@thm_surface_1}"
+      set -g pane-border-format "#{?pane_active,#[fg=#{@thm_lavender}#,bold] ● #P  #{pane_title}  #{pane_current_command} #[default],#[fg=#{@thm_overlay_1}]   #P  #{pane_title}  #{pane_current_command} #[default]}"
 
       # Window renaming
       # @workspace-name が設定されていればワークスペース名のみ、なければコマンド名
@@ -512,10 +516,12 @@ ZSHRC
           done
 
           overview_win=$(tmux new-window -d -n "agents-overview" -P -F "#{window_id}")
+          default_pane=$(tmux list-panes -t "$overview_win" -F "#{pane_id}" | head -1)
           first=1
           for p_id in $pane_ids; do
             if [ "$first" = 1 ]; then
               tmux move-pane -d -s "$p_id" -t "$overview_win"
+              tmux kill-pane -t "$default_pane" 2>/dev/null
               first=0
             else
               tmux join-pane -d -s "$p_id" -t "$overview_win"
