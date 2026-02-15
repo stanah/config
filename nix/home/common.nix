@@ -393,6 +393,11 @@ ZSHRC
       set -g pane-border-style "fg=#{@thm_surface_1}"
       set -g pane-border-format "#{?pane_active,#[fg=#{@thm_lavender}#,bold] ● #P  #{?#{@repo_name},#{@repo_name}#{?#{pane_title}, #{pane_title},},#{pane_title}}  #{pane_current_command} #[default],#[fg=#{@thm_overlay_1}]   #P  #{?#{@repo_name},#{@repo_name}#{?#{pane_title}, #{pane_title},},#{pane_title}}  #{pane_current_command} #[default]}"
 
+      # Active pane: opaque background to stand out
+      # Non-active panes: transparent (terminal default) to recede
+      set -g window-style "bg=default"
+      set -gF window-active-style "bg=#{@thm_bg}"
+
       # Window renaming
       # @workspace-name が設定されていればワークスペース名のみ、なければコマンド名
       set -g automatic-rename on
