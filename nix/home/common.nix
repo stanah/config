@@ -224,16 +224,10 @@
           if [ -n "$ZELLIJ" ]; then
             printf "\033]2;%s\033\\" "$title"
           elif [ -n "$TMUX" ]; then
-            # リポジトリ名をper-pane変数に保存（エージェントがpane_titleを上書きしても維持）
-            tmux set-option -p @repo_name "$title"
             # pane_titleをクリア（エージェントが自由に設定できるようにする）
             printf '\033]2;\033\\'
-            # workspace-manager 管理ウィンドウは automatic-rename-format に任せる
-            local ws_name
-            ws_name=$(tmux show-window-option -v @workspace-name 2>/dev/null)
-            if [ -z "$ws_name" ]; then
-              tmux rename-window "$title"
-            fi
+            # window変数に書き込み、automatic-rename-format で表示する
+            tmux set-window-option @tab-title "$title"
           fi
         }
         autoload -Uz add-zsh-hook
@@ -272,7 +266,18 @@ ZSHRC
     fi
   '';
 
-  programs.tmux = {
+  programs.tmux = let
+    paneLabel = pkgs.writeShellScript "tmux-pane-label" ''
+      dir="$1"
+      if cd "$dir" 2>/dev/null && git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+        repo=$(basename "$(git rev-parse --show-toplevel)")
+        branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
+        echo "''${repo}(''${branch})"
+      else
+        basename "$dir"
+      fi
+    '';
+  in {
     enable = true;
     prefix = "C-Space";
     keyMode = "vi";
@@ -388,10 +393,11 @@ ZSHRC
       set -agF status-right "#{E:@catppuccin_status_date_time}"
 
       # Pane borders
+      # pane_current_path から repo(branch) を取得するヘルパー（status-interval ごとに自動更新）
       set -g pane-border-status top
       set -g pane-active-border-style "fg=#{@thm_lavender}"
       set -g pane-border-style "fg=#{@thm_surface_1}"
-      set -g pane-border-format "#{?pane_active,#[fg=#{@thm_lavender}#,bold] ● #P  #{?#{@repo_name},#{@repo_name}#{?#{pane_title}, #{pane_title},},#{pane_title}}  #{pane_current_command} #[default],#[fg=#{@thm_overlay_1}]   #P  #{?#{@repo_name},#{@repo_name}#{?#{pane_title}, #{pane_title},},#{pane_title}}  #{pane_current_command} #[default]}"
+      set -g pane-border-format "#{?pane_active,#[fg=#{@thm_lavender}#,bold] ● #P  #[fg=#{@thm_green}#,bold]#(${paneLabel} #{pane_current_path})#{?#{pane_title}, #[fg=#{@thm_peach}#,bold]#{pane_title},}  #[fg=#{@thm_lavender}#,bold]#{pane_current_command} #[default],#[fg=#{@thm_surface_2}#,dim]   #P  #[fg=#{@thm_green}#,dim]#(${paneLabel} #{pane_current_path})#{?#{pane_title}, #[fg=#{@thm_peach}#,dim]#{pane_title},}  #[fg=#{@thm_lavender}#,dim]#{pane_current_command} #[default]}"
 
       # Active pane: opaque background to stand out
       # Non-active panes: transparent (terminal default) to recede
@@ -399,9 +405,9 @@ ZSHRC
       set -g window-active-style "bg=#121212"
 
       # Window renaming
-      # @workspace-name が設定されていればワークスペース名のみ、なければコマンド名
+      # @tab-title（precmdで設定）があればそれを、なければコマンド名を表示
       set -g automatic-rename on
-      set -g automatic-rename-format "#{?@workspace-name,#{@workspace-name},#{pane_current_command}}"
+      set -g automatic-rename-format "#{?@tab-title,#{@tab-title},#{pane_current_command}}"
       set -g allow-rename on
 
       # Resurrect & Continuum
