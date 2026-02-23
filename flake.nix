@@ -19,6 +19,7 @@
       user = userConfig.user;
       host = userConfig.host;
       system = userConfig.system;
+      verticalMonitors = userConfig.verticalMonitors or [];
       pkgs = import nixpkgs {
         inherit system;
         config.allowUnfree = true;
@@ -51,7 +52,7 @@
         ${host} = darwin.lib.darwinSystem {
           inherit system;
           specialArgs = {
-            inherit inputs user;
+            inherit inputs user verticalMonitors;
           };
           modules = [
             ./nix/darwin/common.nix
