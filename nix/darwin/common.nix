@@ -35,6 +35,9 @@
     ];
   };
 
+  # Disable "Displays have separate Spaces" for better AeroSpace multi-monitor support
+  system.defaults.spaces.spans-displays = true;
+
   # AeroSpace tiling window manager
   services.aerospace = {
     enable = true;
@@ -72,15 +75,15 @@
 
       # Main mode keybindings
       mode.main.binding = {
-        # Focus: alt + h/j/k/l or arrows
-        alt-h = "focus left";
-        alt-j = "focus down";
-        alt-k = "focus up";
-        alt-l = "focus right";
-        alt-left = "focus left";
-        alt-down = "focus down";
-        alt-up = "focus up";
-        alt-right = "focus right";
+        # Focus: alt + h/j/k/l or arrows (crosses monitor boundaries)
+        alt-h = "focus --boundaries all-monitors-outer-frame left";
+        alt-j = "focus --boundaries all-monitors-outer-frame down";
+        alt-k = "focus --boundaries all-monitors-outer-frame up";
+        alt-l = "focus --boundaries all-monitors-outer-frame right";
+        alt-left = "focus --boundaries all-monitors-outer-frame left";
+        alt-down = "focus --boundaries all-monitors-outer-frame down";
+        alt-up = "focus --boundaries all-monitors-outer-frame up";
+        alt-right = "focus --boundaries all-monitors-outer-frame right";
 
         # Move windows: alt + shift + h/j/k/l or arrows
         alt-shift-h = "move left";
