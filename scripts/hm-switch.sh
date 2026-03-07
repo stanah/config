@@ -32,4 +32,4 @@ if [ -z "$USERNAME" ]; then
   USERNAME="$USER"
 fi
 
-exec home-manager switch --flake ".#${USERNAME}" "${OVERRIDE_ARGS[@]}"
+exec nix run home-manager -- switch --flake ".#${USERNAME}" "${OVERRIDE_ARGS[@]}"

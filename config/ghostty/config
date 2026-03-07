@@ -59,6 +59,16 @@ keybind = cmd+right=text:\x1b[1;9C
 keybind = cmd+up=text:\x1b[1;9A
 keybind = cmd+down=text:\x1b[1;9B
 
+# === Cmd+ijkl → tmux: Pane navigation (CSI ~ encoding) ===
+keybind = cmd+i=text:\x1b[105;9~
+keybind = cmd+j=text:\x1b[106;9~
+keybind = cmd+k=text:\x1b[107;9~
+keybind = cmd+l=text:\x1b[108;9~
+
+# === Cmd+d / Cmd+Shift+d → tmux: Pane split ===
+keybind = cmd+d=text:\x1b[100;9~
+keybind = cmd+shift+d=text:\x1b[100;10~
+
 # === Cmd+Shift → tmux: Tab navigation (CSI modifier 10 = Super+Shift) ===
 keybind = cmd+shift+left=text:\x1b[1;10D
 keybind = cmd+shift+right=text:\x1b[1;10C

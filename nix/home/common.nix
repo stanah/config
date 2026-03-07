@@ -209,7 +209,7 @@
           eval "$("${pkgs.sheldon}/bin/sheldon" source)"
         fi
 
-        # Update pane/window title with repository name and branch (supports Zellij and tmux)
+        # Update pane/window title with repository name and branch (supports cmux, Zellij, and tmux)
         __update_pane_title() {
           local title
           if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
@@ -228,6 +228,8 @@
             printf '\033]2;\033\\'
             # window変数に書き込み、automatic-rename-format で表示する
             tmux set-window-option @tab-title "$title"
+          elif [ -n "$CMUX_WORKSPACE_ID" ]; then
+            printf "\033]2;%s\033\\" "$title"
           fi
         }
         autoload -Uz add-zsh-hook
@@ -355,6 +357,15 @@ ZSHRC
       bind -n User1 if -F '#{pane_at_right}' "" 'select-pane -R'
       bind -n User2 if -F '#{pane_at_top}' "" 'select-pane -U'
       bind -n User3 if -F '#{pane_at_bottom}' "" 'select-pane -D'
+      # Pane navigation: Cmd+i/j/k/l (no wrap)
+      set -s user-keys[13] "\e[105;9~"   # Cmd+i
+      set -s user-keys[14] "\e[106;9~"   # Cmd+j
+      set -s user-keys[15] "\e[107;9~"   # Cmd+k
+      set -s user-keys[16] "\e[108;9~"   # Cmd+l
+      bind -n User13 if -F '#{pane_at_top}' "" 'select-pane -U'
+      bind -n User14 if -F '#{pane_at_left}' "" 'select-pane -L'
+      bind -n User15 if -F '#{pane_at_bottom}' "" 'select-pane -D'
+      bind -n User16 if -F '#{pane_at_right}' "" 'select-pane -R'
 
       # Tab navigation: Cmd+Shift+arrows (no wrap)
       set -s user-keys[4] "\e[1;10D"   # Cmd+Shift+Left
@@ -373,6 +384,12 @@ ZSHRC
       # ghq fuzzy finder: Cmd+g → send Ctrl+g to trigger zsh widget
       set -s user-keys[11] "\e[103;9~" # Cmd+g
       bind -n User11 send-keys C-g
+
+      # Pane split: Cmd+d (horizontal), Cmd+Shift+d (vertical)
+      set -s user-keys[17] "\e[100;9~"   # Cmd+d
+      set -s user-keys[18] "\e[100;10~"  # Cmd+Shift+d
+      bind -n User17 split-window -h -c "#{pane_current_path}"
+      bind -n User18 split-window -v -c "#{pane_current_path}"
 
       # Tab operations: Cmd+Shift+n (new tab), Cmd+Shift+x (close tab)
       set -s user-keys[9] "\e[110;10~"  # Cmd+Shift+n
