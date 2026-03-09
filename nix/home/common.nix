@@ -633,6 +633,7 @@ ZSHRC
     docker
     docker-compose
     unzip
+    glow
   ] ++ lib.optionals stdenv.isDarwin [
     colima  # macOS only: Linux VM for Docker
   ];
