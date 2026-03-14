@@ -1,57 +1,46 @@
-# Neovim setup
+# Neovim setup (AstroNvim v5)
 
-Vim を Neovim に置き換え、lazy.nvim でプラグインを管理します。
+AstroNvim v5 をベースにした Neovim 設定です。
 
 ## Default editor
 
 - `EDITOR` / `VISUAL` は `nvim` に設定しています。
 - `vi` / `vim` / `vimdiff` は Neovim に置き換えられます。
 
-## Plugins (basic set)
+## AstroNvim
 
-- lazy.nvim  
-  - プラグインマネージャ。遅延ロードで起動を軽くします。
-- oil.nvim  
-  - バッファ内でファイル操作ができるファイラー。
-- telescope.nvim  
-  - ファイル/文字列検索の統合UI（`find_files`, `live_grep` など）。
-- nvim-treesitter  
-  - 構文解析によりハイライトやインデントを安定化。
-- mason.nvim + mason-lspconfig + nvim-lspconfig  
-  - LSP サーバのインストールと設定を補助。
-- nvim-cmp + LuaSnip  
-  - 補完とスニペットの統合UI。
-- gitsigns.nvim  
-  - 行ごとの差分をガターに表示。
+- AstroNvim v5 を lazy.nvim 経由でプラグインとして読み込みます。
+- AstroCommunity の Language Pack で言語サポートを追加しています。
 
-## LSP servers
+## Language Packs (AstroCommunity)
 
-次の言語向けに有効化しています:
+- `pack.lua`
+- `pack.typescript`
+- `pack.rust`
+- `pack.python`
 
-- TypeScript
-- Rust
-- Python
-- Solidity
-
-初回起動時に Mason がインストールします。  
-`pyright` / `ts_ls` / Solidity LSP は npm を使うため Node が必要です。  
-Node は mise により自動で入ります。
+各パックには LSP、フォーマッタ、リンタ、Treesitter パーサーが含まれます。
+初回起動時に Mason が自動インストールします。
 
 ## Keymaps
 
-- `<leader>o`: Oil（ファイラーを開く）
-- `<leader>g`: lazygit（フローティング）
-- `<leader>t`: ターミナル（フローティング）
-- `<leader>r`: シェルコマンド実行（フローティング）
-- `<leader>ff`: ファイル検索
-- `<leader>fg`: 全文検索（ripgrep）
-- `<leader>fb`: バッファ一覧
-- `<leader>fh`: ヘルプ検索
-- `[d` / `]d`: 診断の前後移動
+AstroNvim デフォルトのキーマップを使用しています。
+`<Space>` がリーダーキーです。主なバインド:
+
+- `<Leader>e`: ファイルエクスプローラ (Neo-tree)
+- `<Leader>f`: 検索メニュー (Telescope)
+- `<Leader>ff`: ファイル検索
+- `<Leader>fw`: 全文検索
+- `<Leader>fb`: バッファ一覧
+- `<Leader>g`: Git メニュー
+- `<Leader>l`: LSP メニュー
+- `<Leader>t`: ターミナル
+
+詳細: https://docs.astronvim.com/mappings
 
 ## First run
 
 初回は以下を確認してください:
 
-- `:Lazy` to confirm plugins
-- `:Mason` to check LSP installs
+- `:Lazy` でプラグインの状態を確認
+- `:Mason` で LSP サーバーのインストール状態を確認
