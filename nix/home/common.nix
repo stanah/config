@@ -88,6 +88,10 @@
     };
     initContent = lib.mkMerge [
       (lib.mkOrder 500 ''
+        # Remove ~/.nix-profile/bin from PATH — home-manager uses /etc/profiles/per-user/ instead,
+        # and the empty ~/.nix-profile causes "no such file" errors for starship, mise, etc.
+        path=("''${(@)path:#$HOME/.nix-profile/bin}")
+
         # Source home-manager session variables
         if [ -f "${config.home.profileDirectory}/etc/profile.d/hm-session-vars.sh" ]; then
           source "${config.home.profileDirectory}/etc/profile.d/hm-session-vars.sh"
