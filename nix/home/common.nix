@@ -4,8 +4,7 @@
 
   xdg.configFile."ghostty/config".source = ../../config/ghostty/config;
   xdg.configFile."htop/htoprc".source = ../../config/htop/htoprc;
-  xdg.configFile."nvim".source = ../../config/nvim;
-  xdg.configFile."nvim".recursive = true;
+  # nvim config is manually symlinked: ln -s ~/work/github.com/stanah/config/config/nvim ~/.config/nvim
   xdg.configFile."mise/config.toml".source = ../../config/mise-global/config.toml;
   xdg.configFile."starship.toml".source = ../../config/starship/starship.toml;
   xdg.configFile."zellij/config.kdl".source = ../../config/zellij/config.kdl;
