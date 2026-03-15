@@ -75,20 +75,20 @@
 
       # Main mode keybindings
       mode.main.binding = {
-        # Focus: alt + h/j/k/l or arrows (crosses monitor boundaries)
-        alt-h = "focus --boundaries all-monitors-outer-frame left";
-        alt-j = "focus --boundaries all-monitors-outer-frame down";
-        alt-k = "focus --boundaries all-monitors-outer-frame up";
+        # Focus: alt + i/j/k/l or arrows (crosses monitor boundaries)
+        alt-j = "focus --boundaries all-monitors-outer-frame left";
+        alt-k = "focus --boundaries all-monitors-outer-frame down";
+        alt-i = "focus --boundaries all-monitors-outer-frame up";
         alt-l = "focus --boundaries all-monitors-outer-frame right";
         alt-left = "focus --boundaries all-monitors-outer-frame left";
         alt-down = "focus --boundaries all-monitors-outer-frame down";
         alt-up = "focus --boundaries all-monitors-outer-frame up";
         alt-right = "focus --boundaries all-monitors-outer-frame right";
 
-        # Move windows: alt + shift + h/j/k/l or arrows
-        alt-shift-h = "move left";
-        alt-shift-j = "move down";
-        alt-shift-k = "move up";
+        # Move windows: alt + shift + i/j/k/l or arrows
+        alt-shift-j = "move left";
+        alt-shift-k = "move down";
+        alt-shift-i = "move up";
         alt-shift-l = "move right";
         alt-shift-left = "move left";
         alt-shift-down = "move down";
