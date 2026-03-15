@@ -130,14 +130,54 @@
         zmodload -i zsh/complist
         zstyle ':completion:*' descriptions true
         zstyle ':completion:*:descriptions' format '[%d]'
+        zstyle ':completion:*' menu no
         zstyle ':completion:*:*:cd:*' group-order local-directories path-directories
         if [[ -n "''${LS_COLORS-}" ]]; then
           zstyle ':completion:*' list-colors ''${(s.:.)LS_COLORS}
         fi
         zstyle ':completion:*:*:cd:*:local-directories' list-colors 'di=1;32'
-        zstyle ':completion:*:*:cd:*:path-directories' list-colors 'di=1;36'
+        zstyle ':completion:*:*:cd:*:path-directories' list-colors 'di=1;35'
+
+        # fzf-tab: global display settings
+        zstyle ':fzf-tab:*' fzf-flags \
+          --height=60% \
+          --border=rounded \
+          --padding=0,1 \
+          --bind=tab:down
+        zstyle ':fzf-tab:*' use-fzf-default-opts no
+        zstyle ':fzf-tab:*' switch-group '<' '>'
+        zstyle ':fzf-tab:*' show-group brief
+        zstyle ':fzf-tab:*' prefix ""
+        zstyle ':fzf-tab:*' group-colors \
+          $'\e[94m' $'\e[32m' $'\e[33m' $'\e[35m' $'\e[31m' $'\e[36m'
+        # fzf-tab: cd preview
         zstyle ':fzf-tab:complete:cd:*' show-group quiet
-        zstyle ':fzf-tab:complete:cd:*' group-colors $'\e[32m' $'\e[36m'
+        zstyle ':fzf-tab:complete:cd:*' group-colors $'\e[32m' $'\e[35m'
+        zstyle ':fzf-tab:complete:cd:*' fzf-preview \
+          '[[ -d $realpath ]] && eza -1 --color=always --icons $realpath || { found=$(find $GHQ_ROOT -maxdepth 3 -type d -name $word 2>/dev/null | head -1); [[ -n $found ]] && eza -1 --color=always --icons $found; }'
+
+        # fzf-tab: file/directory preview
+        zstyle ':fzf-tab:complete:ls:*' fzf-preview 'eza -1 --color=always --icons $realpath'
+
+        # fzf-tab: process preview (kill/ps)
+        zstyle ':completion:*:*:*:*:processes' command "ps -u $USER -o pid,user,comm -w -w"
+        zstyle ':fzf-tab:complete:(kill|ps):argument-rest' fzf-preview \
+          '[[ $group == "[process ID]" ]] && ps -p $word -o pid,user,%cpu,%mem,command -w -w'
+        zstyle ':fzf-tab:complete:(kill|ps):argument-rest' fzf-flags --preview-window=down:4:wrap
+
+        # fzf-tab: environment variable preview
+        zstyle ':fzf-tab:complete:(-command-|-parameter-|-brace-parameter-|export|unset|expand):*' \
+          fzf-preview 'echo ''${(P)word}'
+
+        # fzf-tab: git previews
+        zstyle ':fzf-tab:complete:git-(add|diff|restore):*' fzf-preview 'git diff $word | delta'
+        zstyle ':fzf-tab:complete:git-log:*' fzf-preview 'git log --color=always $word'
+        zstyle ':fzf-tab:complete:git-checkout:*' fzf-preview \
+          'case "$group" in
+          "modified file") git diff $word | delta ;;
+          "recent commit object name") git show --color=always $word | delta ;;
+          *) git log --color=always $word ;;
+          esac'
 
         setopt inc_append_history
         setopt share_history
