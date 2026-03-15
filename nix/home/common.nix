@@ -51,9 +51,12 @@
     };
   };
 
+  # ~/.zshenvはNix管理外にして書き込み可能にする（~/.zshrcと同じパターン）
+  home.file.".zshenv".enable = false;
+
   programs.zsh = {
     enable = true;
-    dotDir = "${config.xdg.configHome}/zsh-nix";  # Nix管理の設定は別ディレクトリへ（~/.zshrcはツールが書き込み可能）
+    dotDir = "${config.xdg.configHome}/zsh-nix";  # Nix管理の設定は別ディレクトリへ（~/.zshrc, ~/.zshenvはツールが書き込み可能）
     enableCompletion = true;
     profileExtra = lib.optionalString pkgs.stdenv.isDarwin ''
       eval "$(/opt/homebrew/bin/brew shellenv)"
@@ -255,6 +258,19 @@
       '')
     ];
   };
+
+  # ~/.zshenvが存在しなければ作成（ツールが自由に書き込み可能）
+  home.activation.ensureZshenv = lib.hm.dag.entryAfter ["writeBoundary"] ''
+    if [ ! -f "${config.home.homeDirectory}/.zshenv" ]; then
+      cat > "${config.home.homeDirectory}/.zshenv" << 'ZSHENV'
+# User zsh environment (tools can write here freely)
+# Nix-managed settings are loaded from ~/.config/zsh-nix/.zshenv
+source "${config.xdg.configHome}/zsh-nix/.zshenv"
+
+ZSHENV
+      run echo "Created ~/.zshenv"
+    fi
+  '';
 
   # ~/.zshrcが存在しなければ作成
   home.activation.ensureZshrc = lib.hm.dag.entryAfter ["writeBoundary"] ''
