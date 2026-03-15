@@ -95,6 +95,9 @@
       '')
       (lib.mkOrder 550 ''
         fpath=(${pkgs.zsh-completions}/share/zsh/site-functions $fpath)
+
+        # pnpm tab completion
+        eval "$(pnpm completion zsh)"
       '')
       (lib.mkOrder 1000 ''
         if [ -f "${config.xdg.configHome}/private/env" ]; then
