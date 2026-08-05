@@ -11,6 +11,7 @@ font-thicken = true
 background-opacity = 0.9
 background-blur = true
 unfocused-split-opacity = 0.9
+focus-follows-mouse = true
 
 window-save-state = always
 window-inherit-working-directory = true
@@ -73,6 +74,8 @@ keybind = cmd+shift+d=text:\x1b[100;10~
 # === Cmd+Shift → tmux: Tab navigation (CSI modifier 10 = Super+Shift) ===
 keybind = cmd+shift+left=text:\x1b[1;10D
 keybind = cmd+shift+right=text:\x1b[1;10C
+keybind = cmd+shift+j=text:\x1b[106;10~
+keybind = cmd+shift+l=text:\x1b[108;10~
 
 # === Cmd → tmux: Operations (CSI ~ encoding for user-keys compat) ===
 keybind = cmd+n=text:\x1b[110;9~

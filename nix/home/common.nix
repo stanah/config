@@ -430,11 +430,15 @@ ZSHRC
       bind -n User15 if -F '#{pane_at_bottom}' "" 'select-pane -D'
       bind -n User16 if -F '#{pane_at_right}' "" 'select-pane -R'
 
-      # Tab navigation: Cmd+Shift+arrows (no wrap)
+      # Tab navigation: Cmd+Shift+arrows / Cmd+Shift+j/l (no wrap)
       set -s user-keys[4] "\e[1;10D"   # Cmd+Shift+Left
       set -s user-keys[5] "\e[1;10C"   # Cmd+Shift+Right
+      set -s user-keys[19] "\e[106;10~"  # Cmd+Shift+j
+      set -s user-keys[20] "\e[108;10~"  # Cmd+Shift+l
       bind -n User4 if-shell "test #{window_index} != $(tmux list-windows -F '##{window_index}' | head -1)" previous-window
       bind -n User5 if-shell "test #{window_index} != $(tmux list-windows -F '##{window_index}' | tail -1)" next-window
+      bind -n User19 if-shell "test #{window_index} != $(tmux list-windows -F '##{window_index}' | head -1)" previous-window
+      bind -n User20 if-shell "test #{window_index} != $(tmux list-windows -F '##{window_index}' | tail -1)" next-window
 
       # Pane operations: Cmd+n (split), Cmd+x (close), Cmd+f (zoom)
       set -s user-keys[6] "\e[110;9~"  # Cmd+n
