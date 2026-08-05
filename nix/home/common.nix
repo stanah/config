@@ -84,10 +84,13 @@
     };
     initContent = lib.mkMerge [
       (lib.mkOrder 500 ''
-        # Remove ~/.nix-profile/bin from PATH — home-manager uses /etc/profiles/per-user/ instead,
-        # and the empty ~/.nix-profile causes "no such file" errors for starship, mise, etc.
-        path=("''${(@)path:#$HOME/.nix-profile/bin}")
-
+        ${lib.optionalString pkgs.stdenv.isDarwin ''
+          # Remove ~/.nix-profile/bin from PATH — on nix-darwin home-manager uses
+          # /etc/profiles/per-user/ instead, and the empty ~/.nix-profile causes
+          # "no such file" errors for starship, mise, etc.
+          # (Linux のスタンドアロン HM では ~/.nix-profile/bin が本体なので外さない)
+          path=("''${(@)path:#$HOME/.nix-profile/bin}")
+        ''}
         # Source home-manager session variables
         if [ -f "${config.home.profileDirectory}/etc/profile.d/hm-session-vars.sh" ]; then
           source "${config.home.profileDirectory}/etc/profile.d/hm-session-vars.sh"
