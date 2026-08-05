@@ -3,6 +3,7 @@
   xdg.enable = true;
 
   xdg.configFile."ghostty/config".source = ../../config/ghostty/config;
+  xdg.configFile."herdr/config.toml".source = ../../config/herdr/config.toml;
   xdg.configFile."htop/htoprc".source = ../../config/htop/htoprc;
   # nvim config is manually symlinked: ln -s ~/work/github.com/stanah/config/config/nvim ~/.config/nvim
   xdg.configFile."mise/config.toml".source = ../../config/mise-global/config.toml;

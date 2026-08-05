@@ -75,6 +75,7 @@ vim ~/.config/private/env
 ## 管理される設定
 
 - `config/ghostty/config`
+- `config/herdr/config.toml`
 - `config/htop/htoprc`
 - `config/nvim/`
 - `config/mise-global/config.toml`

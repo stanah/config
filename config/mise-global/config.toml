@@ -7,6 +7,8 @@ bun = "latest"
 uv = "latest"
 "cargo:https://github.com/itsjunetime/tdf" = "latest"
 "npm:@marp-team/marp-cli" = "latest"
+"npm:hunkdiff" = "latest"
+"github:ogulcancelik/herdr" = "latest"
 
 [settings]
 auto_install = true

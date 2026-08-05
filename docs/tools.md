@@ -40,8 +40,9 @@ Git の個人情報やトークンは **リポジトリに含めず**にここ�
 
 このリポジトリは `~/.config/mise/config.toml` を配布します  
 （元ファイル: `config/mise-global/config.toml`）。  
-適用時に `mise install --yes` を実行するので、**Node などは自動で入ります**。  
-また、適用時に `mise trust` も実行されます。
+`auto_install` / `not_found_auto_install` を有効にしているので、
+対象コマンドの初回実行時に `mise` が必要なツールを自動導入します。
+明示的に入れる場合は `mise install` を実行してください。
 
 ### Foundry
 
@@ -63,6 +64,25 @@ pnpm は mise でインストールされ、以下は **pnpm に置き換え**�
 
 - `claude`（claude-code CLI）
 - `cursor-agent`（Cursor CLI）
+
+## Herdr
+
+Herdr は agent multiplexer です。`mise` の GitHub backend で入れます。
+現行の `mise` registry に `herdr` が無い環境でも動くように、
+`config/mise-global/config.toml` では `github:ogulcancelik/herdr` を指定しています。
+
+- 起動 / 再接続する
+  - `herdr`
+- Codex / Claude Code の session restore 用 hook を入れる
+  - `herdr integration install codex`
+  - `herdr integration install claude`
+- integration の状態を見る
+  - `herdr integration status`
+- 設定を再読込する
+  - `herdr server reload-config`
+
+設定ファイルは `config/herdr/config.toml` で管理し、
+Home Manager が `~/.config/herdr/config.toml` へ配置します。
 
 ## CodeRabbit CLI
 
