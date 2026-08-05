@@ -46,12 +46,12 @@
 
       # Launch JankyBorders for focused window highlight
       after-startup-command = [
-        "exec-and-forget ${pkgs.jankyborders}/bin/borders active_color=0xffe1e3e4 inactive_color=0xff494d64 width=5.0"
+        "exec-and-forget ${pkgs.jankyborders}/bin/borders active_color=0xffe1e3e4 inactive_color=0xff494d64 width=5.0 blacklist=\"Electron\""
       ];
 
       # Hide border when only one window in workspace
       on-focus-changed = [
-        "exec-and-forget ${pkgs.jankyborders}/bin/borders active_color=0xffe1e3e4 inactive_color=0xff494d64 width=5.0"
+        "exec-and-forget ${pkgs.jankyborders}/bin/borders active_color=0xffe1e3e4 inactive_color=0xff494d64 width=5.0 blacklist=\"Electron\""
       ];
 
       # Normalizations
@@ -72,6 +72,20 @@
         outer.top = 5;
         outer.right = 5;
       };
+
+      # Window detection rules: exclude specific apps from tiling.
+      # iris (~/work/github.com/stanah/iris) は素の Electron バンドルで
+      # 起動するため bundle ID が "com.github.Electron" になる。
+      # 注意: 他の未署名 Electron 開発アプリも同じ ID を共有するため、
+      # 将来衝突した場合は window-title-regex-substring の併用を検討。
+      on-window-detected = [
+        {
+          "if" = {
+            app-id = "com.github.Electron";
+          };
+          run = [ "layout floating" ];
+        }
+      ];
 
       # Main mode keybindings
       mode.main.binding = {
