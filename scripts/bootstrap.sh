@@ -43,9 +43,19 @@ fi
 # Auto-detect system if not specified
 if [ -z "$SYSTEM" ]; then
   case "$(uname -s)" in
-    Darwin) SYSTEM="aarch64-darwin" ;;
-    Linux)  SYSTEM="x86_64-linux" ;;
-    *)      echo "Error: Unknown OS: $(uname -s)" >&2; exit 1 ;;
+    Darwin)
+      case "$(uname -m)" in
+        arm64|aarch64) SYSTEM="aarch64-darwin" ;;
+        *)             SYSTEM="x86_64-darwin" ;;
+      esac
+      ;;
+    Linux)
+      case "$(uname -m)" in
+        arm64|aarch64) SYSTEM="aarch64-linux" ;;
+        *)             SYSTEM="x86_64-linux" ;;
+      esac
+      ;;
+    *) echo "Error: Unknown OS: $(uname -s)" >&2; exit 1 ;;
   esac
 fi
 

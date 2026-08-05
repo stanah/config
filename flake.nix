@@ -28,23 +28,33 @@
       hostProfiles = {
         # macOS profiles
         personal = {
+          platform = "darwin";
           darwin = [ ./nix/darwin/personal.nix ];
-          home = [ ./nix/home/personal.nix ];
+          home = [ ./nix/home/darwin.nix ./nix/home/personal.nix ];
         };
         work = {
+          platform = "darwin";
           darwin = [ ./nix/darwin/work.nix ];
-          home = [ ./nix/home/work.nix ];
+          home = [ ./nix/home/darwin.nix ./nix/home/work.nix ];
         };
-        # Linux profiles
-        gpu-server = {
+        # Linux profiles (いずれも WSL2 Ubuntu 想定)
+        ubuntu = {
+          platform = "linux";
           darwin = [];
-          home = [ ./nix/home/gpu-server.nix ];
+          home = [ ./nix/home/linux-common.nix ./nix/home/ubuntu.nix ];
+        };
+        gpu-server = {
+          platform = "linux";
+          darwin = [];
+          home = [ ./nix/home/linux-common.nix ./nix/home/gpu-server.nix ];
         };
       };
       selectedProfile =
-        if builtins.hasAttr host hostProfiles
-        then hostProfiles.${host}
-        else throw "Unknown host: ${host}. Add it to hostProfiles.";
+        if !(builtins.hasAttr host hostProfiles)
+        then throw "Unknown host: ${host}. Add it to hostProfiles."
+        else if (hostProfiles.${host}.platform == "darwin") != isDarwin
+        then throw "Host '${host}' is a ${hostProfiles.${host}.platform} profile but system is '${system}'. Fix nix/user-config.nix."
+        else hostProfiles.${host};
     in
     {
       # Darwin configurations (macOS only)

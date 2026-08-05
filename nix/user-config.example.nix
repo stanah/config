@@ -3,7 +3,7 @@
 
   # Host profiles:
   #   macOS: "personal", "work"
-  #   Linux: "gpu-server"
+  #   Linux (WSL2 Ubuntu): "ubuntu" (GPU なし), "gpu-server" (NVIDIA GPU あり)
   host = "personal";
 
   # System architectures:

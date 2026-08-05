@@ -21,6 +21,8 @@
   # BUN_INSTALL/PNPM_HOME are required for global package installs
 
   home.sessionVariables = {
+    # ロケールを UTF-8 にしないと日本語がバイト列 (<E3><83>...) で表示される
+    LANG = "en_US.UTF-8";
     GHQ_ROOT = "${config.home.homeDirectory}/work";
     BUN_INSTALL = "${config.home.homeDirectory}/.bun";
     PNPM_HOME = "${config.home.homeDirectory}/.local/share/pnpm";
@@ -58,9 +60,6 @@
     enable = true;
     dotDir = "${config.xdg.configHome}/zsh-nix";  # Nix管理の設定は別ディレクトリへ（~/.zshrc, ~/.zshenvはツールが書き込み可能）
     enableCompletion = true;
-    profileExtra = lib.optionalString pkgs.stdenv.isDarwin ''
-      eval "$(/opt/homebrew/bin/brew shellenv)"
-    '';
     autosuggestion.enable = false;
     syntaxHighlighting.enable = false;
     history = {
@@ -406,7 +405,13 @@ ZSHRC
       bind -T copy-mode-vi C-v send-keys -X rectangle-toggle
 
       # Mouse drag selection → clipboard copy
-      bind -T copy-mode-vi MouseDragEnd1Pane send-keys -X copy-pipe-and-cancel "pbcopy"
+      ${if pkgs.stdenv.isDarwin then ''
+        bind -T copy-mode-vi MouseDragEnd1Pane send-keys -X copy-pipe-and-cancel "pbcopy"
+      '' else ''
+        # Linux (WSL 前提): OSC52 + clip.exe。clip.exe が無い環境では OSC52 のみ
+        set -g set-clipboard on
+        bind -T copy-mode-vi MouseDragEnd1Pane send-keys -X copy-pipe-and-cancel "command -v clip.exe >/dev/null && clip.exe || cat >/dev/null"
+      ''}
 
       # === Cmd key support (via Ghostty escape sequences) ===
       # Ghostty sends CSI with modifier 9 (Super) / 10 (Super+Shift)
@@ -701,8 +706,7 @@ ZSHRC
     docker-compose
     unzip
     glow
-  ] ++ lib.optionals stdenv.isDarwin [
-    colima  # macOS only: Linux VM for Docker
+    htop  # 設定は config/htop/htoprc で配布
   ];
 
   xdg.configFile."sheldon/plugins.toml".text = ''

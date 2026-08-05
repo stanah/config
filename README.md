@@ -29,6 +29,17 @@ sudo -H nix run github:LnL7/nix-darwin -- switch --flake ".#myhost" \
 sudo -H ./scripts/bootstrap.sh
 ```
 
+## 使い方 (Ubuntu / WSL2)
+
+Linux プロファイル（`ubuntu` / `gpu-server`）はいずれも WSL2 上の Ubuntu を想定しています。
+systemd の有効化、ロケール生成、ログインシェル変更、Docker Engine、GPU（nvidia-container-toolkit）などの OS 側セットアップを含む手順は `docs/ubuntu.md` を参照してください。
+
+```sh
+# nix/user-config.nix で host = "ubuntu" または "gpu-server"、system = "x86_64-linux" を設定
+./scripts/bootstrap.sh   # 初回（Nix 導入 + home-manager 適用）
+./scripts/hm-switch.sh   # 2回目以降
+```
+
 ### 3) chezmoi を初期化して反映（任意）
 このリポジトリは Nix/HM で設定を管理します。chezmoi を使う場合のみ実行します。
 
@@ -40,7 +51,7 @@ chezmoi init --source "$PWD" --apply
 ## 変更ポイント
 
 - `nix/user-config.nix` は Git 管理外です。`nix/user-config.example.nix` をコピーして作成してください。
-- `nix/user-config.nix` の `user`, `host`, `system` を自分の環境に合わせて変更してください（`host` は `personal` / `work` を選択）。
+- `nix/user-config.nix` の `user`, `host`, `system` を自分の環境に合わせて変更してください（`host` は macOS なら `personal` / `work`、WSL2 Ubuntu なら `ubuntu` / `gpu-server`）。
 - `networking.hostName` は設定していないので、既存の macOS ホスト名が維持されます。
 - `nix/darwin/personal.nix` は個人用、`nix/darwin/work.nix` は業務用の設定として分離しています。
 - `nix/home/personal.nix` と `nix/home/work.nix` も同様に分離しています。
@@ -58,6 +69,7 @@ chezmoi init --source "$PWD" --apply
 - `docs/zsh.md` (zsh 移行/補完/キーバインド)
 - `docs/tools.md` (導入ツールの基本的な使い方)
 - `docs/nvim.md` (Neovim セットアップ)
+- `docs/ubuntu.md` (Ubuntu / WSL2 セットアップとプラットフォーム別構成)
 
 ## プライベート環境変数のセットアップ
 
