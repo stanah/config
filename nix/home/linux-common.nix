@@ -4,7 +4,7 @@
   # Ubuntu を想定している（ネイティブ Linux が増えたらここを分割する）。
   #
   # WSL 前提のため、ここに入れないもの:
-  #   - ターミナル (Ghostty) / フォント: Windows 側で管理する
+  #   - ターミナル (Ghostty) とその表示フォント: Windows 側で管理する
   #   - GUI クリップボードツール: clip.exe (WSL interop) と OSC52 で足りる
   #
   # OS 側セットアップ (systemd, locale-gen, docker-ce, ログインシェル等) は
@@ -16,9 +16,18 @@
     LOCALE_ARCHIVE = "${pkgs.glibcLocales}/lib/locale/locale-archive";
   };
 
+  # WSL 内のヘッドレス描画用フォント。ターミナル表示は Windows 側フォントを
+  # 使うが、画像生成 (ComfyUI)、matplotlib、Playwright のスクリーンショット、
+  # PDF 出力などは Linux 側のフォントを参照するため、無いと日本語が豆腐になる
+  fonts.fontconfig.enable = true;
+
   home.packages = with pkgs; [
     # Server utilities
     httpie
+
+    # Fonts (headless rendering)
+    plemoljp-nf
+    noto-fonts-cjk-sans
   ];
 
   # Docker について:

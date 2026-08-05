@@ -6,8 +6,11 @@
 - **gpu-server**：NVIDIA GPU を持つ WSL2 Ubuntu（例: RTX 3080）。
   主用途は LLM 推論 (Ollama, LM Studio)、TTS Server、Docker 経由の ComfyUI。
 
-ターミナル、フォント、クリップボードの描画は Windows 側の責務なので、WSL 内には入れない。
-PlemolJP Console NF などのフォントは Windows Terminal 側にインストールする。
+ターミナルとクリップボードの描画は Windows 側の責務なので、WSL 内には入れない。
+Windows Terminal の表示フォント（PlemolJP Console NF など）も Windows 側にインストールする。
+
+一方、WSL 内のヘッドレス描画（ComfyUI の画像生成、matplotlib、Playwright のスクリーンショット、PDF 出力など）は Linux 側のフォントを参照する。
+このため `linux-common.nix` が PlemolJP NF と Noto Sans CJK を Home Manager 経由で入れる。
 
 ## プラットフォーム別の構成
 
@@ -18,7 +21,7 @@ Home Manager モジュールは次のように分割している。
 | `nix/home/common.nix` | 全 OS 共通（zsh, tmux, CLI ツール, docker CLI） | すべて |
 | `nix/home/darwin.nix` | macOS 共通（colima, brew shellenv） | personal, work |
 | `nix/home/personal.nix` / `work.nix` | 個人 Mac / 業務 Mac 固有 | 各プロファイル |
-| `nix/home/linux-common.nix` | WSL2 Ubuntu 共通（LOCALE_ARCHIVE, httpie） | ubuntu, gpu-server |
+| `nix/home/linux-common.nix` | WSL2 Ubuntu 共通（LOCALE_ARCHIVE, httpie, 描画用フォント） | ubuntu, gpu-server |
 | `nix/home/ubuntu.nix` | 通常 Ubuntu 固有（現状は空） | ubuntu |
 | `nix/home/gpu-server.nix` | GPU マシン固有（nvidia-smi エイリアス） | gpu-server |
 
@@ -30,7 +33,7 @@ Home Manager モジュールは次のように分割している。
 |---|---|
 | 全 OS 共通 | zsh, starship, tmux, Neovim, mise（node, pnpm, bun, uv, herdr, hunkdiff 等）, git, gh, lazygit, fzf, eza, bat, ripgrep 系ツール, atuin, direnv, zellij, btop, htop, docker CLI, docker-compose, lazydocker |
 | macOS のみ | colima（Docker デーモン）, AeroSpace, JankyBorders, Homebrew casks（Ghostty, フォント） |
-| WSL2 Ubuntu 共通 | LOCALE_ARCHIVE（glibc ロケール）, httpie |
+| WSL2 Ubuntu 共通 | LOCALE_ARCHIVE（glibc ロケール）, httpie, PlemolJP NF / Noto Sans CJK（ヘッドレス描画用） |
 | GPU マシンのみ | nvidia-smi エイリアス（nv, nvw） |
 
 ## OS 側セットアップ（Home Manager 管理外）
