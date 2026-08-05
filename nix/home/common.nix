@@ -8,9 +8,6 @@
   # nvim config is manually symlinked: ln -s ~/work/github.com/stanah/config/config/nvim ~/.config/nvim
   xdg.configFile."mise/config.toml".source = ../../config/mise-global/config.toml;
   xdg.configFile."starship.toml".source = ../../config/starship/starship.toml;
-  xdg.configFile."zellij/config.kdl".source = ../../config/zellij/config.kdl;
-  xdg.configFile."zellij/layouts".source = ../../config/zellij/layouts;
-  xdg.configFile."zellij/layouts".recursive = true;
 
   home.username = user;
   home.homeDirectory = if pkgs.stdenv.isDarwin then "/Users/${user}" else "/home/${user}";
@@ -258,7 +255,7 @@
           eval "$("${pkgs.sheldon}/bin/sheldon" source)"
         fi
 
-        # Update pane/window title with repository name and branch (supports cmux, Zellij, and tmux)
+        # Update pane/window title with repository name and branch (OSC2; Herdr, cmux, Ghostty tabs)
         __update_pane_title() {
           local title
           if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
@@ -270,16 +267,7 @@
             title="''${PWD##*/}"
           fi
 
-          if [ -n "$ZELLIJ" ]; then
-            printf "\033]2;%s\033\\" "$title"
-          elif [ -n "$TMUX" ]; then
-            # pane_titleをクリア（エージェントが自由に設定できるようにする）
-            printf '\033]2;\033\\'
-            # window変数に書き込み、automatic-rename-format で表示する
-            tmux set-window-option @tab-title "$title"
-          elif [ -n "$CMUX_WORKSPACE_ID" ]; then
-            printf "\033]2;%s\033\\" "$title"
-          fi
+          printf "\033]2;%s\033\\" "$title"
         }
         autoload -Uz add-zsh-hook
         add-zsh-hook precmd __update_pane_title
@@ -294,7 +282,7 @@
       (lib.mkOrder 1400 ''
         # Keybindings that must be set after __bindkey_apply (mkOrder 1300)
         bindkey '^g' ghq-fzf
-        bindkey '\e[103;9~' ghq-fzf  # Cmd+g (via Ghostty/tmux)
+        bindkey '\e[103;9~' ghq-fzf  # Cmd+g (via Ghostty)
       '')
       (lib.mkOrder 1500 ''
         # ユーザーの~/.zshrc（ツールが自由に書き込み可能）
@@ -330,340 +318,6 @@ ZSHRC
     fi
   '';
 
-  programs.tmux = let
-    paneLabel = pkgs.writeShellScript "tmux-pane-label" ''
-      dir="$1"
-      if cd "$dir" 2>/dev/null && git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
-        repo=$(basename "$(git rev-parse --show-toplevel)")
-        branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
-        echo "''${repo}(''${branch})"
-      else
-        basename "$dir"
-      fi
-    '';
-  in {
-    enable = true;
-    prefix = "C-Space";
-    keyMode = "vi";
-    mouse = true;
-    baseIndex = 1;
-    escapeTime = 0;
-    historyLimit = 50000;
-    terminal = "tmux-256color";
-    plugins = with pkgs.tmuxPlugins; [
-      sensible
-      yank
-      vim-tmux-navigator
-      {
-        plugin = catppuccin;
-        extraConfig = ''
-          set -g @catppuccin_window_text ' #W'
-          set -g @catppuccin_window_current_text ' #W'
-        '';
-      }
-      resurrect
-      continuum
-    ];
-    extraConfig = ''
-      # True color support
-      set -ag terminal-overrides ",xterm-256color:RGB"
-      set -ag terminal-overrides ",*256col*:Tc"
-
-      # Note: extended-keys intentionally off; Cmd+key uses custom CSI ~ sequences via user-keys
-
-      # Undercurl support
-      set -as terminal-overrides ',*:Smulx=\E[4::%p1%dm'
-      set -as terminal-overrides ',*:Setulc=\E[58::2::%p1%{65536}%/%d::%p1%{256}%/%{255}%&%d::%p1%{255}%&%d%;m'
-
-      # Pane splitting (unified with zellij tmux mode: % = right, " = down)
-      bind % split-window -h -c "#{pane_current_path}"
-      bind '"' split-window -v -c "#{pane_current_path}"
-      # Additional intuitive bindings
-      bind | split-window -h -c "#{pane_current_path}"
-      bind - split-window -v -c "#{pane_current_path}"
-      bind c new-window -c "#{pane_current_path}"
-
-      # Vi-style pane navigation (same as zellij tmux mode h/j/k/l, no wrap)
-      bind h if -F '#{pane_at_left}' "" 'select-pane -L'
-      bind j if -F '#{pane_at_bottom}' "" 'select-pane -D'
-      bind k if -F '#{pane_at_top}' "" 'select-pane -U'
-      bind l if -F '#{pane_at_right}' "" 'select-pane -R'
-
-      # Pane resizing (matches zellij resize mode H/J/K/L = decrease)
-      bind -r H resize-pane -L 5
-      bind -r J resize-pane -D 5
-      bind -r K resize-pane -U 5
-      bind -r L resize-pane -R 5
-
-      # Mouse: double-click = equalize panes, triple-click = cycle layout
-      bind -T root DoubleClick1Pane select-layout -E
-      bind -T root TripleClick1Pane next-layout
-
-      # Vi copy mode
-      bind -T copy-mode-vi v send-keys -X begin-selection
-      bind -T copy-mode-vi y send-keys -X copy-selection-and-cancel
-      bind -T copy-mode-vi C-v send-keys -X rectangle-toggle
-
-      # Mouse drag selection → clipboard copy
-      ${if pkgs.stdenv.isDarwin then ''
-        bind -T copy-mode-vi MouseDragEnd1Pane send-keys -X copy-pipe-and-cancel "pbcopy"
-      '' else ''
-        # Linux (WSL 前提): OSC52 + clip.exe。clip.exe が無い環境では OSC52 のみ
-        set -g set-clipboard on
-        bind -T copy-mode-vi MouseDragEnd1Pane send-keys -X copy-pipe-and-cancel "command -v clip.exe >/dev/null && clip.exe || cat >/dev/null"
-      ''}
-
-      # === Cmd key support (via Ghostty escape sequences) ===
-      # Ghostty sends CSI with modifier 9 (Super) / 10 (Super+Shift)
-
-      # Pane navigation: Cmd+arrows (no wrap)
-      set -s user-keys[0] "\e[1;9D"    # Cmd+Left
-      set -s user-keys[1] "\e[1;9C"    # Cmd+Right
-      set -s user-keys[2] "\e[1;9A"    # Cmd+Up
-      set -s user-keys[3] "\e[1;9B"    # Cmd+Down
-      bind -n User0 if -F '#{pane_at_left}' "" 'select-pane -L'
-      bind -n User1 if -F '#{pane_at_right}' "" 'select-pane -R'
-      bind -n User2 if -F '#{pane_at_top}' "" 'select-pane -U'
-      bind -n User3 if -F '#{pane_at_bottom}' "" 'select-pane -D'
-      # Pane navigation: Cmd+i/j/k/l (no wrap)
-      set -s user-keys[13] "\e[105;9~"   # Cmd+i
-      set -s user-keys[14] "\e[106;9~"   # Cmd+j
-      set -s user-keys[15] "\e[107;9~"   # Cmd+k
-      set -s user-keys[16] "\e[108;9~"   # Cmd+l
-      bind -n User13 if -F '#{pane_at_top}' "" 'select-pane -U'
-      bind -n User14 if -F '#{pane_at_left}' "" 'select-pane -L'
-      bind -n User15 if -F '#{pane_at_bottom}' "" 'select-pane -D'
-      bind -n User16 if -F '#{pane_at_right}' "" 'select-pane -R'
-
-      # Tab navigation: Cmd+Shift+arrows / Cmd+Shift+j/l (no wrap)
-      set -s user-keys[4] "\e[1;10D"   # Cmd+Shift+Left
-      set -s user-keys[5] "\e[1;10C"   # Cmd+Shift+Right
-      set -s user-keys[19] "\e[106;10~"  # Cmd+Shift+j
-      set -s user-keys[20] "\e[108;10~"  # Cmd+Shift+l
-      bind -n User4 if-shell "test #{window_index} != $(tmux list-windows -F '##{window_index}' | head -1)" previous-window
-      bind -n User5 if-shell "test #{window_index} != $(tmux list-windows -F '##{window_index}' | tail -1)" next-window
-      bind -n User19 if-shell "test #{window_index} != $(tmux list-windows -F '##{window_index}' | head -1)" previous-window
-      bind -n User20 if-shell "test #{window_index} != $(tmux list-windows -F '##{window_index}' | tail -1)" next-window
-
-      # Pane operations: Cmd+n (split), Cmd+x (close), Cmd+f (zoom)
-      set -s user-keys[6] "\e[110;9~"  # Cmd+n
-      set -s user-keys[7] "\e[120;9~"  # Cmd+x
-      set -s user-keys[8] "\e[102;9~"  # Cmd+f
-      bind -n User6 split-window -h -c "#{pane_current_path}"
-      bind -n User7 kill-pane
-      bind -n User8 resize-pane -Z
-
-      # ghq fuzzy finder: Cmd+g → send Ctrl+g to trigger zsh widget
-      set -s user-keys[11] "\e[103;9~" # Cmd+g
-      bind -n User11 send-keys C-g
-
-      # Pane split: Cmd+d (horizontal), Cmd+Shift+d (vertical)
-      set -s user-keys[17] "\e[100;9~"   # Cmd+d
-      set -s user-keys[18] "\e[100;10~"  # Cmd+Shift+d
-      bind -n User17 split-window -h -c "#{pane_current_path}"
-      bind -n User18 split-window -v -c "#{pane_current_path}"
-
-      # Tab operations: Cmd+Shift+n (new tab), Cmd+Shift+x (close tab)
-      set -s user-keys[9] "\e[110;10~"  # Cmd+Shift+n
-      set -s user-keys[10] "\e[120;10~" # Cmd+Shift+x
-      bind -n User9 new-window -c "#{pane_current_path}"
-      bind -n User10 kill-window
-
-      # Catppuccin theme
-      set -g @catppuccin_flavor 'mocha'
-      set -g @catppuccin_window_status_style 'rounded'
-
-      # Status bar
-      set -g status-position top
-      set -g status-interval 5
-      set -g status-left-length 30
-      set -g status-left "#{E:@catppuccin_status_session}"
-      set -g status-right "#{E:@catppuccin_status_application}"
-      set -agF status-right "#{E:@catppuccin_status_date_time}"
-
-      # Pane borders
-      # pane_current_path から repo(branch) を取得するヘルパー（status-interval ごとに自動更新）
-      set -g pane-border-status top
-      set -g pane-active-border-style "fg=#{@thm_lavender}"
-      set -g pane-border-style "fg=#{@thm_surface_1}"
-      set -g pane-border-format "#{?pane_active,#[fg=#{@thm_lavender}#,bold] ● #P  #[fg=#{@thm_green}#,bold]#(${paneLabel} #{pane_current_path})#{?#{pane_title}, #[fg=#{@thm_peach}#,bold]#{pane_title},}  #[fg=#{@thm_lavender}#,bold]#{pane_current_command} #[default],#[fg=#{@thm_surface_2}#,dim]   #P  #[fg=#{@thm_green}#,dim]#(${paneLabel} #{pane_current_path})#{?#{pane_title}, #[fg=#{@thm_peach}#,dim]#{pane_title},}  #[fg=#{@thm_lavender}#,dim]#{pane_current_command} #[default]}"
-
-      # Active pane: opaque background to stand out
-      # Non-active panes: transparent (terminal default) to recede
-      set -g window-style "bg=default"
-      set -g window-active-style "bg=#121212"
-
-      # Window renaming
-      # @tab-title（precmdで設定）があればそれを、なければコマンド名を表示
-      set -g automatic-rename on
-      set -g automatic-rename-format "#{?@tab-title,#{@tab-title},#{pane_current_command}}"
-      set -g allow-rename on
-
-      # Resurrect & Continuum
-      set -g @resurrect-capture-pane-contents 'on'
-      set -g @continuum-restore 'on'
-      set -g @continuum-save-interval '15'
-
-      # Focus events for neovim
-      set -g focus-events on
-
-      # Gather/Scatter: Cmd+\ で AI エージェント系ペインを一時集約/復帰
-      set -s user-keys[12] "\e[92;9~"
-      bind -n User12 run-shell "${pkgs.writeShellScript "tmux-gather" ''
-        TARGETS="claude|kiro|codex|aider|cursor"
-        overview_win=$(tmux show-environment -g GATHER_OVERVIEW_WIN 2>/dev/null | cut -d= -f2)
-
-        if [ -n "$overview_win" ] && tmux list-windows -F "#{window_id}" | grep -qF "$overview_win"; then
-          # === Scatter ===
-          mapping=$(tmux show-environment -g GATHER_MAPPING 2>/dev/null | cut -d= -f2-)
-          layouts=$(tmux show-environment -g GATHER_LAYOUTS 2>/dev/null | cut -d= -f2-)
-          pane_orders=$(tmux show-environment -g GATHER_PANE_ORDERS 2>/dev/null | cut -d= -f2-)
-          IFS="|"
-          for entry in $mapping; do
-            p_id=$(echo "$entry" | cut -d, -f1)
-            w_id=$(echo "$entry" | cut -d, -f2)
-            if tmux list-panes -t "$p_id" -F "#{pane_id}" 2>/dev/null | grep -q .; then
-              tmux move-pane -d -s "$p_id" -t "$w_id" 2>/dev/null
-            fi
-          done
-          # Kill placeholder panes that kept windows alive during gather
-          placeholders=$(tmux show-environment -g GATHER_PLACEHOLDERS 2>/dev/null | cut -d= -f2-)
-          for ph in $placeholders; do
-            [ -n "$ph" ] && tmux kill-pane -t "$ph" 2>/dev/null
-          done
-          # Restore original pane order per window
-          echo "$pane_orders" | tr '|' '\n' > /tmp/tmux-gather-orders
-          while IFS= read -r oentry; do
-            o_wid=$(echo "$oentry" | cut -d= -f1)
-            o_order=$(echo "$oentry" | cut -d= -f2-)
-            idx=0
-            IFS=' '
-            for expected_pane in $(echo "$o_order" | tr ',' ' '); do
-              current_pane=$(tmux list-panes -t "$o_wid" -F "#{pane_id}" 2>/dev/null | sed -n "$((idx+1))p")
-              if [ -n "$current_pane" ] && [ "$current_pane" != "$expected_pane" ]; then
-                tmux swap-pane -d -s "$expected_pane" -t "$current_pane" 2>/dev/null
-              fi
-              idx=$((idx+1))
-            done
-          done < /tmp/tmux-gather-orders
-          # Restore original layouts
-          echo "$layouts" | tr '|' '\n' > /tmp/tmux-gather-layouts
-          while IFS= read -r lentry; do
-            l_wid=$(echo "$lentry" | cut -d, -f1)
-            l_layout=$(echo "$lentry" | cut -d, -f2-)
-            tmux select-layout -t "$l_wid" "$l_layout" 2>/dev/null
-          done < /tmp/tmux-gather-layouts
-          rm -f /tmp/tmux-gather-orders /tmp/tmux-gather-layouts
-          remaining=$(tmux list-panes -t "$overview_win" -F x 2>/dev/null | wc -l | tr -d ' ')
-          if [ "''${remaining:-0}" -gt 0 ]; then
-            tmux rename-window -t "$overview_win" "orphaned-panes"
-            tmux display-message "Scattered ($remaining orphaned panes remain)"
-          else
-            tmux kill-window -t "$overview_win" 2>/dev/null
-            tmux display-message "Panes scattered back"
-          fi
-          tmux set-environment -g -u GATHER_OVERVIEW_WIN
-          tmux set-environment -g -u GATHER_MAPPING
-          tmux set-environment -g -u GATHER_LAYOUTS
-          tmux set-environment -g -u GATHER_PANE_ORDERS
-          tmux set-environment -g -u GATHER_PLACEHOLDERS
-        else
-          # === Gather ===
-          mapping=""
-          pane_ids=""
-          layouts=""
-          pane_orders=""
-          saved_windows=""
-          all_procs=$(ps -eo pid=,ppid=,args=)
-
-          for pane_info in $(tmux list-panes -s -F "#{pane_id}:#{pane_pid}:#{window_id}"); do
-            pid=$(echo "$pane_info" | cut -d: -f2)
-            found=$(echo "$all_procs" | awk -v root="$pid" -v pat="$TARGETS" '
-              {
-                pp[$1]=$2
-                n=split($3,a,"/"); bn[$1]=a[n]
-                arg2[$1]=""
-                if(substr($4,1,1)=="/") arg2[$1]=$4
-              }
-              END {
-                pids[root]=1
-                for(pass=0;pass<5;pass++){
-                  changed=0
-                  for(p in pp){
-                    if((p in pids)==0 && (pp[p] in pids)){
-                      pids[p]=1; changed=1
-                    }
-                  }
-                  if(changed==0) break
-                }
-                for(p in pids){
-                  if(tolower(bn[p]) ~ pat || tolower(arg2[p]) ~ pat){
-                    print bn[p]; exit
-                  }
-                }
-              }
-            ')
-            if [ -n "$found" ]; then
-              p_id=$(echo "$pane_info" | cut -d: -f1)
-              w_id=$(echo "$pane_info" | cut -d: -f3)
-              mapping="''${mapping:+$mapping|}$p_id,$w_id"
-              pane_ids="$pane_ids $p_id"
-              # Save window layout and pane order (once per window)
-              case "$saved_windows" in
-                *"$w_id"*) ;;
-                *)
-                  w_layout=$(tmux display-message -t "$w_id" -p "#{window_layout}")
-                  layouts="''${layouts:+$layouts|}$w_id,$w_layout"
-                  w_panes=$(tmux list-panes -t "$w_id" -F "#{pane_id}" | tr '\n' ',' | sed 's/,$//')
-                  pane_orders="''${pane_orders:+$pane_orders|}$w_id=$w_panes"
-                  saved_windows="$saved_windows $w_id"
-                  ;;
-              esac
-            fi
-          done
-
-          if [ -z "$pane_ids" ]; then
-            tmux display-message "No agent panes found"
-            exit 0
-          fi
-
-          # Create placeholder panes for windows that would become empty
-          placeholders=""
-          for w_id in $(echo "$mapping" | tr '|' '\n' | cut -d, -f2 | sort -u); do
-            total=$(tmux list-panes -t "$w_id" -F x 2>/dev/null | wc -l | tr -d ' ')
-            agents=$(echo "$mapping" | tr '|' '\n' | grep ",$w_id$" | wc -l | tr -d ' ')
-            if [ "$total" -le "$agents" ]; then
-              ph=$(tmux split-window -d -t "$w_id" -P -F "#{pane_id}" "sleep infinity")
-              placeholders="''${placeholders:+$placeholders|}$ph"
-            fi
-          done
-
-          overview_win=$(tmux new-window -d -n "agents-overview" -P -F "#{window_id}")
-          default_pane=$(tmux list-panes -t "$overview_win" -F "#{pane_id}" | head -1)
-          first=1
-          for p_id in $pane_ids; do
-            if [ "$first" = 1 ]; then
-              tmux move-pane -d -s "$p_id" -t "$overview_win"
-              tmux kill-pane -t "$default_pane" 2>/dev/null
-              first=0
-            else
-              tmux join-pane -d -s "$p_id" -t "$overview_win" 2>/dev/null \
-                || tmux join-pane -dh -s "$p_id" -t "$overview_win" 2>/dev/null
-            fi
-            tmux select-layout -t "$overview_win" tiled 2>/dev/null
-          done
-          tmux set-environment -g GATHER_OVERVIEW_WIN "$overview_win"
-          tmux set-environment -g GATHER_MAPPING "$mapping"
-          tmux set-environment -g GATHER_LAYOUTS "$layouts"
-          tmux set-environment -g GATHER_PANE_ORDERS "$pane_orders"
-          tmux set-environment -g GATHER_PLACEHOLDERS "$placeholders"
-          tmux select-window -t "$overview_win"
-          count=$(tmux list-panes -t "$overview_win" -F x 2>/dev/null | wc -l | tr -d " ")
-          tmux display-message "Gathered $count agent panes"
-        fi
-      ''}"
-    '';
-  };
 
   programs.starship.enable = true;
   programs.neovim = {
@@ -699,7 +353,6 @@ ZSHRC
     gh
     gh-dash
     perl
-    zellij
     btop
     lazydocker
     docker

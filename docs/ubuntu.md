@@ -18,7 +18,7 @@ Home Manager モジュールは次のように分割している。
 
 | モジュール | 役割 | 読み込むプロファイル |
 |---|---|---|
-| `nix/home/common.nix` | 全 OS 共通（zsh, tmux, CLI ツール, docker CLI） | すべて |
+| `nix/home/common.nix` | 全 OS 共通（zsh, Herdr, CLI ツール, docker CLI） | すべて |
 | `nix/home/darwin.nix` | macOS 共通（colima, brew shellenv） | personal, work |
 | `nix/home/personal.nix` / `work.nix` | 個人 Mac / 業務 Mac 固有 | 各プロファイル |
 | `nix/home/linux-common.nix` | WSL2 Ubuntu 共通（LOCALE_ARCHIVE, httpie, 描画用フォント） | ubuntu, gpu-server |
@@ -31,7 +31,7 @@ Home Manager モジュールは次のように分割している。
 
 | 分類 | 内容 |
 |---|---|
-| 全 OS 共通 | zsh, starship, tmux, Neovim, mise（node, pnpm, bun, uv, herdr, hunkdiff 等）, git, gh, lazygit, fzf, eza, bat, ripgrep 系ツール, atuin, direnv, zellij, btop, htop, docker CLI, docker-compose, lazydocker |
+| 全 OS 共通 | zsh, starship, Neovim, mise（node, pnpm, bun, uv, herdr, hunkdiff 等）, git, gh, lazygit, fzf, eza, bat, atuin, direnv, btop, htop, docker CLI, docker-compose, lazydocker |
 | macOS のみ | colima（Docker デーモン）, AeroSpace, JankyBorders, Homebrew casks（Ghostty, フォント） |
 | WSL2 Ubuntu 共通 | LOCALE_ARCHIVE（glibc ロケール）, httpie, PlemolJP NF / Noto Sans CJK（ヘッドレス描画用） |
 | GPU マシンのみ | nvidia-smi エイリアス（nv, nvw） |

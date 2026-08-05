@@ -100,7 +100,7 @@ vim ~/.config/private/env
 ## メモ
 
 - chezmoi の source はリポジトリ直下です。`nix/` や `flake.nix` は `.chezmoiignore` で除外しています。
-- **ユーザー設定のみ変更**（tmux, zsh, starship 等）: `./scripts/hm-switch.sh`（sudo 不要）
+- **ユーザー設定のみ変更**（zsh, starship 等）: `./scripts/hm-switch.sh`（sudo 不要）
 - **システム全体を再構築**（launchd, system defaults 等）: `sudo -H ./scripts/rebuild.sh`
 - `darwin-rebuild` を直接実行する場合: `sudo -H darwin-rebuild switch --flake '.#personal'`
 - 既存設定をリポジトリへ反映する場合は `scripts/sync-config.sh` を実行してください。

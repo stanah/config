@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # Standalone home-manager switch (no sudo required)
-# Use this for user-level changes (tmux, zsh, starship, etc.)
+# Use this for user-level changes (zsh, starship, etc.)
 # For system-level changes (launchd, system defaults), use rebuild.sh with sudo.
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"

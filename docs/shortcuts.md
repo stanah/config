@@ -5,7 +5,7 @@
 `shortcuts.json` をキーボードショートカットの Single Source of Truth として管理する。
 
 - **表示**: `stanah/keymap-overlay` アプリが読み込んでオーバーレイ表示
-- **同期**: 将来的に各ツールの設定ファイル（Ghostty, Zellij, AeroSpace, Neovim等）へ書き出す仕組みを検討
+- **同期**: 将来的に各ツールの設定ファイル（Ghostty, Herdr, AeroSpace, Neovim等）へ書き出す仕組みを検討
 
 ## 現状のショートカット管理状況
 
@@ -13,7 +13,7 @@
 |---------|--------|---------|-------------|
 | ウィンドウ管理 | AeroSpace | Alt+key | `nix/darwin/common.nix` |
 | ターミナル | Ghostty | Cmd+key | `config/ghostty/config` |
-| ターミナルマルチプレクサ | Zellij | Ctrl+key | `config/zellij/config.kdl` |
+| ターミナルマルチプレクサ | Herdr | Cmd+key (予定) | `config/herdr/config.toml` |
 | エディタ | Neovim | Space+key | `config/nvim/lua/config/keymaps.lua` |
 | シェル | zsh/fzf | Ctrl+R 等 | - |
 
