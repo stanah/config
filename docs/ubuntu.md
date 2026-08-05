@@ -78,6 +78,10 @@ sh <(curl --fail -L https://nixos.org/nix/install) --daemon
 その後 `./scripts/bootstrap.sh` を実行すると、Linux では home-manager の適用まで行われる。
 2回目以降の反映は `./scripts/hm-switch.sh` でよい。
 
+バイナリキャッシュに無いパッケージはソースビルドされる（aarch64-linux では mise がこれに該当した）。
+Rust 製ツールのビルドはメモリを消費するため、WSL のメモリ割り当てが小さいと OOM で失敗する。
+初回適用は 8GB 以上を目安にし、足りない場合は `.wslconfig` の `memory=` を引き上げる。
+
 ### 5. Docker Engine を入れる
 
 docker CLI と docker compose は Nix から入る（クライアントのみ）。

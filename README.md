@@ -1,116 +1,95 @@
 # config
 
-chezmoi + nix-darwin + home-manager をまとめたリポジトリです。
+nix-darwin + home-manager で macOS と WSL2 Ubuntu の環境を管理するリポジトリです。
 
-## 使い方 (macOS)
+## 対応環境
 
-### 1) Nix を入れる
-公式インストーラで導入します（詳細は Nix のドキュメントを参照）。
+| host プロファイル | 環境 | system |
+|---|---|---|
+| `personal` | 個人 Mac | `aarch64-darwin` |
+| `work` | 業務 Mac | `aarch64-darwin` |
+| `ubuntu` | WSL2 Ubuntu（GPU なし） | `x86_64-linux` |
+| `gpu-server` | WSL2 Ubuntu（NVIDIA GPU） | `x86_64-linux` |
 
-### 2) nix-darwin を初回適用
-以下で nix-darwin をブートストラップします。
+`host` と `system` の OS が一致しない場合は評価エラーになります。
 
-```sh
-sudo -H nix run github:LnL7/nix-darwin -- switch --flake ".#personal"
-```
+## セットアップ
 
-別ユーザ/ホストで使う場合は `user-config` を差し替えられます。
+共通の準備として、`nix/user-config.example.nix` を `nix/user-config.nix` にコピーし、`user` / `host` / `system` を環境に合わせます（このファイルは Git 管理外です）。
 
-```sh
-sudo -H nix run github:LnL7/nix-darwin -- switch --flake ".#myhost" \
-  --override-input user-config path:/path/to/user-config.nix
-```
-
-`sudo -H` は root の `HOME` を使うために必要です（`$HOME is not owned by you` エラー回避）。
-
-または、`scripts/bootstrap.sh`を実行します（引数が無い場合は `nix/user-config.nix` の `host` を参照）：
+### macOS
 
 ```sh
 sudo -H ./scripts/bootstrap.sh
 ```
 
-## 使い方 (Ubuntu / WSL2)
+Nix が無ければインストールし、nix-darwin を初回適用します。
+`sudo -H` は root の `HOME` を使うために必要です（`$HOME is not owned by you` エラー回避）。
 
-Linux プロファイル（`ubuntu` / `gpu-server`）はいずれも WSL2 上の Ubuntu を想定しています。
-systemd の有効化、ロケール生成、ログインシェル変更、Docker Engine、GPU（nvidia-container-toolkit）などの OS 側セットアップを含む手順は `docs/ubuntu.md` を参照してください。
+### Ubuntu (WSL2)
 
-```sh
-# nix/user-config.nix で host = "ubuntu" または "gpu-server"、system = "x86_64-linux" を設定
-./scripts/bootstrap.sh   # 初回（Nix 導入 + home-manager 適用）
-./scripts/hm-switch.sh   # 2回目以降
+systemd の有効化、ロケール生成、ログインシェル変更、Docker Engine、GPU（nvidia-container-toolkit）といった OS 側の準備が先に必要です。
+手順は `docs/ubuntu.md` を参照してください。
+OS 側の準備後は macOS と同様に `./scripts/bootstrap.sh` を実行します（Linux では home-manager の適用まで行われます。sudo 不要）。
+
+## 日常操作
+
+- ユーザー設定の反映（zsh, starship 等。sudo 不要）: `./scripts/hm-switch.sh`
+- macOS のシステム設定を含む再構築（launchd, system defaults 等）: `sudo -H ./scripts/rebuild.sh`
+- 実機で直接編集した設定をリポジトリへ回収: `./scripts/sync-config.sh` の後に `git add` / `git commit`
+
+## 構成
+
+```text
+nix/
+├── darwin/            # macOS システム設定 (AeroSpace, JankyBorders, Homebrew casks)
+│   ├── common.nix
+│   ├── personal.nix
+│   └── work.nix
+└── home/              # Home Manager 設定
+    ├── common.nix        # 全 OS 共通 (zsh, CLI ツール, docker CLI, mise)
+    ├── darwin.nix        # macOS 共通 (colima, brew shellenv)
+    ├── personal.nix      # 個人 Mac 固有
+    ├── work.nix          # 業務 Mac 固有
+    ├── linux-common.nix  # WSL2 Ubuntu 共通 (ロケール, 描画用フォント)
+    ├── ubuntu.nix        # 通常 Ubuntu 固有
+    └── gpu-server.nix    # GPU マシン固有 (nvidia-smi エイリアス)
 ```
 
-### 3) chezmoi を初期化して反映（任意）
-このリポジトリは Nix/HM で設定を管理します。chezmoi を使う場合のみ実行します。
-
-```sh
-nix profile install nixpkgs#chezmoi
-chezmoi init --source "$PWD" --apply
-```
-
-## 変更ポイント
-
-- `nix/user-config.nix` は Git 管理外です。`nix/user-config.example.nix` をコピーして作成してください。
-- `nix/user-config.nix` の `user`, `host`, `system` を自分の環境に合わせて変更してください（`host` は macOS なら `personal` / `work`、WSL2 Ubuntu なら `ubuntu` / `gpu-server`）。
-- `networking.hostName` は設定していないので、既存の macOS ホスト名が維持されます。
-- `nix/darwin/personal.nix` は個人用、`nix/darwin/work.nix` は業務用の設定として分離しています。
-- `nix/home/personal.nix` と `nix/home/work.nix` も同様に分離しています。
-- `nix/home/common.nix` の `home.stateVersion` は更新方針に合わせて調整してください。
-- 秘密情報は `~/.config/private/env` と `~/.config/private/gitconfig` に置き、Git には載せません。
-- 既存ファイルは `.before-nix` でバックアップされます。
-
-## 追加の分割
-
-- `nix/darwin/common.nix` と `nix/darwin/personal.nix` に分割しています。
-- `nix/home/common.nix` と `nix/home/personal.nix` に分割しています。
-
-## ドキュメント
-
-- `docs/zsh.md` (zsh 移行/補完/キーバインド)
-- `docs/tools.md` (導入ツールの基本的な使い方)
-- `docs/nvim.md` (Neovim セットアップ)
-- `docs/ubuntu.md` (Ubuntu / WSL2 セットアップとプラットフォーム別構成)
-
-## プライベート環境変数のセットアップ
-
-秘密情報（APIキーなど）は Git 管理外の `~/.config/private/env` に置きます。
-
-```sh
-mkdir -p ~/.config/private
-cp config/private.env.example ~/.config/private/env
-# 実際の値を設定
-vim ~/.config/private/env
-```
-
-このファイルは zsh 起動時に自動で読み込まれます。
-
-## 管理される設定
+配布される設定ファイルは `config/` 以下にあります。
 
 - `config/ghostty/config`
 - `config/herdr/config.toml`
 - `config/htop/htoprc`
-- `config/nvim/`
 - `config/mise-global/config.toml`
 - `config/starship/starship.toml`
+- `config/nvim/`（Home Manager 管理外。`ln -s <repo>/config/nvim ~/.config/nvim` で手動リンク）
 
-## フォント
+ターミナルマルチプレクサは Herdr に一本化しています（tmux と zellij は廃止済み）。
 
-- `font-plemol-jp-nf` は Homebrew cask でインストールされます。
+## 秘密情報
+
+API キーや Git の個人情報は Git 管理外の `~/.config/private/` に置きます。
+
+```sh
+mkdir -p ~/.config/private
+cp config/private.env.example ~/.config/private/env
+vim ~/.config/private/env   # 実際の値を設定
+```
+
+- `~/.config/private/env`: zsh 起動時に自動で読み込まれます。
+- `~/.config/private/gitconfig`: git 設定に include されます（書式は `docs/tools.md` を参照）。
+
+## ドキュメント
+
+- `docs/ubuntu.md`: Ubuntu / WSL2 のセットアップとプラットフォーム別構成
+- `docs/tools.md`: 導入ツールの基本的な使い方
+- `docs/zsh.md`: zsh の構成（sheldon, fzf, 補完）
+- `docs/nvim.md`: Neovim セットアップ
 
 ## メモ
 
-- chezmoi の source はリポジトリ直下です。`nix/` や `flake.nix` は `.chezmoiignore` で除外しています。
-- **ユーザー設定のみ変更**（zsh, starship 等）: `./scripts/hm-switch.sh`（sudo 不要）
-- **システム全体を再構築**（launchd, system defaults 等）: `sudo -H ./scripts/rebuild.sh`
-- `darwin-rebuild` を直接実行する場合: `sudo -H darwin-rebuild switch --flake '.#personal'`
-- 既存設定をリポジトリへ反映する場合は `scripts/sync-config.sh` を実行してください。
-
-## 設定の同期手順（実機 → リポジトリ）
-
-実機で設定を変更した場合は、以下の手順でリポジトリへ反映します。
-
-```sh
-./scripts/sync-config.sh
-git add config/ghostty/config config/htop/htoprc config/starship/starship.toml
-git commit -m "設定更新"
-```
+- macOS のフォント（PlemolJP Console NF）は Homebrew cask で入ります。WSL2 側のフォントは `docs/ubuntu.md` を参照してください。
+- home-manager 適用時、既存ファイルは `.before-nix` 拡張子でバックアップされます。
+- `home.stateVersion` は `nix/home/common.nix` にあります。更新方針に合わせて調整してください。
+- chezmoi は任意です（`chezmoi init --source "$PWD" --apply`）。`nix/` や `flake.nix` は `.chezmoiignore` で除外しています。
