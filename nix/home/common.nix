@@ -10,7 +10,7 @@
   xdg.configFile."starship.toml".source = ../../config/starship/starship.toml;
 
   home.username = user;
-  home.homeDirectory = if pkgs.stdenv.isDarwin then "/Users/${user}" else "/home/${user}";
+  home.homeDirectory = if pkgs.stdenv.hostPlatform.isDarwin then "/Users/${user}" else "/home/${user}";
 
   home.stateVersion = "24.05";
 
@@ -84,7 +84,7 @@
     };
     initContent = lib.mkMerge [
       (lib.mkOrder 500 ''
-        ${lib.optionalString pkgs.stdenv.isDarwin ''
+        ${lib.optionalString pkgs.stdenv.hostPlatform.isDarwin ''
           # Remove ~/.nix-profile/bin from PATH — on nix-darwin home-manager uses
           # /etc/profiles/per-user/ instead, and the empty ~/.nix-profile causes
           # "no such file" errors for starship, mise, etc.
@@ -328,6 +328,9 @@ ZSHRC
     viAlias = true;
     vimAlias = true;
     vimdiffAlias = true;
+    # home-manager 26.05 でデフォルトが false になったため、従来の挙動を明示的に維持する
+    withRuby = true;
+    withPython3 = true;
   };
   programs.direnv = {
     enable = true;
@@ -337,7 +340,11 @@ ZSHRC
     enable = true;
     enableZshIntegration = true;
   };
-  programs.atuin.enable = true;
+  programs.atuin = {
+    enable = true;
+    # Ctrl-R は fzf が担当する (ATUIN_NOBIND でキーバインド自体も無効化済み)
+    flags = [ "--disable-ctrl-r" ];
+  };
   programs.sheldon.enable = true;
   programs.zoxide.enable = true;
   programs.eza.enable = true;
