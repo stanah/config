@@ -17,5 +17,6 @@ sync_file() {
 }
 
 sync_file "$HOME/.config/ghostty/config" "$repo_root/config/ghostty/config"
+sync_file "$HOME/.config/karabiner/karabiner.json" "$repo_root/config/karabiner/karabiner.json"
 sync_file "$HOME/.config/htop/htoprc" "$repo_root/config/htop/htoprc"
 sync_file "$HOME/.config/starship.toml" "$repo_root/config/starship/starship.toml"

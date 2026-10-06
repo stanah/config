@@ -25,15 +25,22 @@
     enable = true;
     onActivation = {
       cleanup = "none";
-      autoUpdate = false;
-      upgrade = false;
+      # rebuild のたびに Homebrew 本体と formula を更新し、古いパッケージを upgrade する
+      autoUpdate = true;
+      upgrade = true;
     };
+    # 自己アップデート機能を持つ cask (ghostty, 1password 等) も brew 側で最新にする
+    greedyCasks = true;
     casks = [
       "font-plemol-jp-nf"
       "ghostty"
+      "karabiner-elements" # 設定は config/karabiner/karabiner.json (nix/home/darwin.nix で配置)
       "kiro-cli"
     ];
   };
+
+  # F1〜F12 はメディアキー (明るさ・音量等) のまま使う。標準ファンクションキーは fn+F1〜F12
+  system.defaults.NSGlobalDomain."com.apple.keyboard.fnState" = false;
 
   # Disable "Displays have separate Spaces" for better AeroSpace multi-monitor support
   system.defaults.spaces.spans-displays = true;

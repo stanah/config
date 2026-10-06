@@ -37,18 +37,19 @@ OS 側の準備後は macOS と同様に `./scripts/bootstrap.sh` を実行し�
 - ユーザー設定の反映（zsh, starship 等。sudo 不要）: `./scripts/hm-switch.sh`
 - macOS のシステム設定を含む再構築（launchd, system defaults 等）: `sudo -H ./scripts/rebuild.sh`
 - 実機で直接編集した設定をリポジトリへ回収: `./scripts/sync-config.sh` の後に `git add` / `git commit`
+- パッケージの更新: `nix flake update` で Nix の入力を更新し、`sudo -H ./scripts/rebuild.sh` を実行します。macOS では rebuild 時に Homebrew 本体と formula / cask も最新に更新されます。
 
 ## 構成
 
 ```text
 nix/
-├── darwin/            # macOS システム設定 (AeroSpace, JankyBorders, Homebrew casks)
+├── darwin/            # macOS システム設定 (AeroSpace, JankyBorders, Homebrew casks, キーボード)
 │   ├── common.nix
 │   ├── personal.nix
 │   └── work.nix
 └── home/              # Home Manager 設定
     ├── common.nix        # 全 OS 共通 (zsh, CLI ツール, docker CLI, mise)
-    ├── darwin.nix        # macOS 共通 (colima, brew shellenv)
+    ├── darwin.nix        # macOS 共通 (colima, brew shellenv, karabiner.json の配置)
     ├── personal.nix      # 個人 Mac 固有
     ├── work.nix          # 業務 Mac 固有
     ├── linux-common.nix  # WSL2 Ubuntu 共通 (ロケール, 描画用フォント)
@@ -60,6 +61,7 @@ nix/
 
 - `config/ghostty/config`
 - `config/herdr/config.toml`
+- `config/karabiner/karabiner.json`（macOS のみ。書き込み可能なコピーとして配置）
 - `config/htop/htoprc`
 - `config/mise-global/config.toml`
 - `config/starship/starship.toml`
@@ -83,6 +85,7 @@ vim ~/.config/private/env   # 実際の値を設定
 ## ドキュメント
 
 - `docs/ubuntu.md`: Ubuntu / WSL2 のセットアップとプラットフォーム別構成
+- `docs/keyboard.md`: macOS のキーボード設定（Karabiner-Elements, Control と Command の入れ替え, 英かな）
 - `docs/tools.md`: 導入ツールの基本的な使い方
 - `docs/zsh.md`: zsh の構成（sheldon, fzf, 補完）
 - `docs/nvim.md`: Neovim セットアップ

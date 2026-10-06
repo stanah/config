@@ -11,6 +11,7 @@
 
 | レイヤー | ツール | 修飾キー | 設定ファイル |
 |---------|--------|---------|-------------|
+| 修飾キー・英かな | Karabiner-Elements | 左Ctrl⇔左Cmd, Cmd 単押し | `config/karabiner/karabiner.json` |
 | ウィンドウ管理 | AeroSpace | Alt+key | `nix/darwin/common.nix` |
 | ターミナル | Ghostty | Cmd+key | `config/ghostty/config` |
 | ターミナルマルチプレクサ | Herdr | Cmd+key (予定) | `config/herdr/config.toml` |
